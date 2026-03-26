@@ -10,7 +10,7 @@
     :root {
       --bg: #0d0d0d; --surface: #161616; --surface2: #1f1f1f;
       --border: #2a2a2a; --text: #f0ede6; --muted: #888;
-      --accent: #e8f55a; --accent-dark: #b8c43a;
+      --accent: #1C9AFD; --accent-dark: #1482D9; /* Stark ko'k rangi */
       --fake: #ff5c5c; --suspicious: #ffb347; --real: #5cffa0;
     }
     body {
@@ -97,9 +97,9 @@
 </head>
 <body>
 <header>
-  <div class="logo-badge">AI Powered</div>
+  <div class="logo-badge">VerAi</div>
   <h1>Fake News<br><span>Detector</span></h1>
-  <p class="subtitle">Yangilik yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol tahlil qiladi.</p>
+  <p class="subtitle">Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol internetdagi ishonchli rasmiy manbalardan tahlil qiladi.</p>
 </header>
 
 <div class="card">
@@ -109,7 +109,7 @@
     <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <span>Tahlil qilinmoqda...</span>
   </div>
-  <button class="btn" id="analyzeBtn" onclick="analyze()">Soxta yangiliklarni aniqlash</button>
+  <button class="btn" id="analyzeBtn" onclick="analyze()">Yangiliklarni haqiqiy yoki yolg'onligini aniqlash</button>
   <div class="result" id="result">
     <div class="verdict-header" id="verdictHeader">
       <span class="verdict-text" id="verdictText"></span>
@@ -124,7 +124,7 @@
   </div>
 </div>
 
-<footer>Groq AI yordamida ishlamoqda &mdash; Ta'lim maqsadida</footer>
+<footer>By BulderFounders team &mdash; for AI Hackathon &mdash; March 26-27-28</footer>
 
 <script>
 async function analyze() {
