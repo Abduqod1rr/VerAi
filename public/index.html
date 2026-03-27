@@ -4,13 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fake News Detector</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5071542360049001"
+     crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0d0d0d; --surface: #161616; --surface2: #1f1f1f;
       --border: #2a2a2a; --text: #f0ede6; --muted: #888;
-      --accent: #1C9AFD; --accent-dark: #1482D9; /* Stark ko'k rangi */
+      --accent: #1C9AFD; --accent-dark: #1482D9;
       --fake: #ff5c5c; --suspicious: #ffb347; --real: #5cffa0;
     }
     body {
@@ -96,12 +98,13 @@
   </style>
 </head>
 <body>
+ 
 <header>
   <div class="logo-badge">VerAi</div>
   <h1>Fake News<br><span>Detector</span></h1>
   <p class="subtitle">Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol internetdagi ishonchli rasmiy manbalardan tahlil qiladi.</p>
 </header>
-
+ 
 <div class="card">
   <textarea id="newsInput" placeholder="Yangilik sarlavhasi yoki maqola parchasini shu yerga joylashtiring..."></textarea>
   <div class="error-msg" id="errorMsg"></div>
@@ -123,9 +126,9 @@
     </div>
   </div>
 </div>
-
+ 
 <footer>By BulderFounders team &mdash; for AI Hackathon &mdash; March 26-27-28</footer>
-
+ 
 <script>
 async function analyze() {
   const text = document.getElementById('newsInput').value.trim();
@@ -133,34 +136,34 @@ async function analyze() {
   const loader = document.getElementById('loader');
   const result = document.getElementById('result');
   const errorMsg = document.getElementById('errorMsg');
-
+ 
   errorMsg.style.display = 'none';
   result.style.display = 'none';
-
+ 
   if (!text) {
     errorMsg.textContent = 'Iltimos, tahlil qilish uchun matn kiriting.';
     errorMsg.style.display = 'block';
     return;
   }
-
+ 
   btn.disabled = true;
   loader.style.display = 'flex';
-
+ 
   try {
     const res = await fetch('/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text })
     });
-
+ 
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.error || 'Server xatosi');
     }
-
+ 
     const parsed = await res.json();
     render(parsed);
-
+ 
   } catch (e) {
     errorMsg.textContent = 'Xato: ' + (e.message || 'Nimadir noto\'g\'ri ketdi.');
     errorMsg.style.display = 'block';
@@ -169,7 +172,7 @@ async function analyze() {
     loader.style.display = 'none';
   }
 }
-
+ 
 function render(d) {
   const verdictLabels = {
     'LIKELY FAKE': 'SOXTA EHTIMOLI YUQORI',
@@ -198,13 +201,10 @@ function render(d) {
   resultEl.style.borderColor = c.border;
   resultEl.style.display = 'block';
 }
-
+ 
 document.getElementById('newsInput').addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'Enter') analyze();
 });
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5071542360049001"
-     crossorigin="anonymous"></script>
-
 </body>
-</html> 
+</html>
