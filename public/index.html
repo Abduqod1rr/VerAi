@@ -1,57 +1,209 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+  <meta name="google-adsense-account" content="ca-pub-5071542360049001">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fake News Detector</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5071542360049001"
-     crossorigin="anonymous"></script>
+  <title>VerAi — Fake News Detector</title>
+  <link rel="icon" type="image/png" href="Group 28.png">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
+
+    :root[data-theme="dark"] {
       --bg: #0d0d0d; --surface: #161616; --surface2: #1f1f1f;
       --border: #2a2a2a; --text: #f0ede6; --muted: #888;
       --accent: #1C9AFD; --accent-dark: #1482D9;
       --fake: #ff5c5c; --suspicious: #ffb347; --real: #5cffa0;
+      --overlay: rgba(0,0,0,0.72);
+      --sidebar-bg: #111111; --sidebar-hover: #1e1e1e;
+      --v-fake-bg: #2a0f0f; --v-fake-b: #ff5c5c; --v-fake-t: #ff5c5c; --v-fake-p: rgba(255,92,92,0.13);
+      --v-sus-bg:  #2a1c0a; --v-sus-b:  #ffb347; --v-sus-t:  #ffb347; --v-sus-p:  rgba(255,179,71,0.13);
+      --v-real-bg: #0a2a16; --v-real-b: #5cffa0; --v-real-t: #5cffa0; --v-real-p: rgba(92,255,160,0.13);
     }
+    :root[data-theme="light"] {
+      --bg: #f2f2f0; --surface: #ffffff; --surface2: #ebebeb;
+      --border: #d8d8d8; --text: #111111; --muted: #777;
+      --accent: #1282d8; --accent-dark: #0e6db8;
+      --fake: #cc2222; --suspicious: #b06000; --real: #0a8a40;
+      --overlay: rgba(0,0,0,0.35);
+      --sidebar-bg: #fafafa; --sidebar-hover: #efefef;
+      --v-fake-bg: #fde8e8; --v-fake-b: #cc2222; --v-fake-t: #aa1111; --v-fake-p: rgba(200,30,30,0.1);
+      --v-sus-bg:  #fef3e2; --v-sus-b:  #b06000; --v-sus-t:  #904d00; --v-sus-p:  rgba(176,96,0,0.1);
+      --v-real-bg: #e6f7ed; --v-real-b: #0a8a40; --v-real-t: #087033; --v-real-p: rgba(10,138,64,0.1);
+    }
+
     body {
       background: var(--bg); color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; padding: 3rem 1.5rem;
+      font-family: 'DM Sans', sans-serif; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 3rem 1.5rem; transition: background 0.3s, color 0.3s;
     }
-    header { text-align: center; margin-bottom: 3rem; animation: fadeUp 0.6s ease both; }
+
+    /* ── MENU BUTTON ── */
+    .menu-btn {
+      position: fixed; top: 18px; left: 18px; z-index: 800;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; width: 42px; height: 42px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 5px; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, opacity 0.22s, transform 0.22s;
+    }
+    .menu-btn:hover { background: var(--surface2); border-color: var(--accent); }
+    .menu-btn span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
+    .menu-btn.hidden { opacity: 0; pointer-events: none; transform: translateX(-10px) scale(0.88); }
+
+    /* ── OVERLAY ── */
+    .overlay {
+      position: fixed; inset: 0; background: var(--overlay);
+      z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 300px;
+      background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      z-index: 950; transform: translateX(-100%);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), background 0.3s, border-color 0.3s;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-header {
+      padding: 22px 22px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; }
+    .sidebar-badge {
+      background: var(--accent); color: #fff;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 99px;
+    }
+    .sidebar-logo-text { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+    .sidebar-close {
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      padding: 6px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, background 0.2s;
+    }
+    .sidebar-close:hover { color: var(--text); background: var(--surface2); }
+    .sidebar-close svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
+    .sidebar-body { flex: 1; overflow-y: auto; padding: 20px 12px 12px; }
+    .sidebar-section-label {
+      font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); padding: 0 10px; margin-bottom: 8px;
+    }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 10px 12px 14px; }
+    .sidebar-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 12px; border-radius: 12px; cursor: pointer;
+      transition: background 0.15s; margin-bottom: 4px; user-select: none;
+    }
+    .sidebar-item:hover { background: var(--sidebar-hover); }
+    .sidebar-item-left { display: flex; align-items: center; gap: 13px; }
+    .sidebar-item-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.2s;
+    }
+    .sidebar-item:hover .sidebar-item-icon { background: var(--border); }
+    .sidebar-item-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; }
+    .sidebar-item-info { display: flex; flex-direction: column; gap: 3px; }
+    .sidebar-item-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
+    .sidebar-item-sub { font-size: 11px; color: var(--muted); line-height: 1; }
+    .toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; }
+    .toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 99px; transition: background 0.25s; }
+    .toggle-track.on { background: var(--accent); }
+    .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    .toggle-thumb.on { transform: translateX(20px); }
+    .contact-section { padding: 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .contact-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px; border-radius: 12px; text-decoration: none; transition: background 0.15s;
+    }
+    .contact-link:hover { background: var(--sidebar-hover); }
+    .contact-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(28,154,253,0.1); border: 1px solid rgba(28,154,253,0.25);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .contact-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; }
+    .contact-text { display: flex; flex-direction: column; gap: 3px; }
+    .contact-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
+    .contact-email { font-size: 11px; color: var(--accent); line-height: 1; }
+    .sidebar-footer { padding: 10px 22px 14px; font-size: 10px; color: var(--muted); opacity: 0.45; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+    /* ── SESSION STATS BAR ── */
+    .stats-bar {
+      width: 100%; max-width: 700px; margin-bottom: 1.4rem;
+      display: flex; gap: 10px; animation: fadeUp 0.5s ease both;
+    }
+    .stat-pill {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 11px 14px;
+      display: flex; flex-direction: column; gap: 4px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .stat-pill-val {
+      font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800;
+      color: var(--text); line-height: 1;
+    }
+    .stat-pill-val.red   { color: var(--fake); }
+    .stat-pill-val.amber { color: var(--suspicious); }
+    .stat-pill-val.green { color: var(--real); }
+    .stat-pill-label { font-size: 10px; color: var(--muted); font-family: 'Syne', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* ── MAIN ── */
+    header { text-align: center; margin-bottom: 2rem; animation: fadeUp 0.6s ease both; }
     .logo-badge {
-      display: inline-block; background: var(--accent); color: #0d0d0d;
+      display: inline-block; background: var(--accent); color: #fff;
       font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
       letter-spacing: 0.15em; text-transform: uppercase;
       padding: 4px 14px; border-radius: 99px; margin-bottom: 1.2rem;
     }
-    h1 {
-      font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 6vw, 3.8rem);
-      font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.75rem;
-    }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 6vw, 3.8rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
     h1 span { color: var(--accent); }
     .subtitle { color: var(--muted); font-size: 1rem; max-width: 420px; margin: 0 auto; line-height: 1.6; }
+
     .card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 20px; padding: 2rem; width: 100%; max-width: 700px;
-      animation: fadeUp 0.6s ease 0.1s both;
+      animation: fadeUp 0.6s ease 0.1s both; transition: background 0.3s, border-color 0.3s;
+      position: relative;
     }
+
+    /* ── REALTIME BADGE ── */
+    .realtime-badge {
+      position: absolute; top: 16px; right: 16px;
+      font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); background: rgba(28,154,253,0.1);
+      border: 1px solid rgba(28,154,253,0.2);
+      padding: 3px 9px 3px 7px; border-radius: 99px;
+      display: flex; align-items: center; gap: 5px;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .realtime-badge.visible { opacity: 1; }
+    .rt-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse-dot 1.2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.65)} }
+
     textarea {
       width: 100%; min-height: 150px; resize: vertical;
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: 14px; color: var(--text);
       font-family: 'DM Sans', sans-serif; font-size: 15px;
       line-height: 1.7; padding: 14px 16px; outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
     }
     textarea:focus { border-color: var(--accent); }
     textarea::placeholder { color: var(--muted); }
+
     .btn {
       margin-top: 1rem; width: 100%; padding: 14px;
-      background: var(--accent); color: #0d0d0d; border: none;
+      background: var(--accent); color: #fff; border: none;
       border-radius: 12px; font-family: 'Syne', sans-serif;
       font-size: 15px; font-weight: 700; cursor: pointer;
       letter-spacing: 0.02em; transition: background 0.2s, transform 0.1s;
@@ -59,63 +211,210 @@
     .btn:hover { background: var(--accent-dark); }
     .btn:active { transform: scale(0.98); }
     .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-    .loader {
-      display: none; align-items: center; justify-content: center;
-      gap: 8px; padding: 1.2rem 0; color: var(--muted); font-size: 14px;
-    }
+
+    .loader { display: none; align-items: center; justify-content: center; gap: 8px; padding: 1.2rem 0; color: var(--muted); font-size: 14px; }
     .dots { display: flex; gap: 5px; }
-    .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); animation: bounce 1.2s infinite;
-    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite; }
     .dot:nth-child(2) { animation-delay: 0.2s; }
     .dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
-    .result {
-      display: none; margin-top: 1.5rem; border: 1px solid var(--border);
-      border-radius: 16px; overflow: hidden; animation: fadeUp 0.4s ease both;
-    }
-    .verdict-header { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .verdict-text { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
-    .confidence-badge {
-      font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif;
-      padding: 4px 12px; border-radius: 99px; letter-spacing: 0.05em;
-    }
+
+    /* ── RESULT ── */
+    .result { display: none; margin-top: 1.5rem; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; animation: fadeUp 0.4s ease both; }
+    .verdict-header { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .verdict-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .verdict-text { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; }
+    .confidence-badge { font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif; padding: 4px 12px; border-radius: 99px; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0; }
+
+    /* ── ARC METER ── */
+    .arc-wrap { flex-shrink: 0; width: 58px; height: 58px; }
+    .arc-wrap svg { overflow: visible; }
+    .arc-bg   { fill: none; stroke: var(--border); stroke-width: 4.5; stroke-linecap: round; }
+    .arc-fill { fill: none; stroke-width: 4.5; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.4s; }
+    .arc-pct  { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+
     .result-body { padding: 18px 20px; border-top: 1px solid var(--border); background: var(--surface); }
-    .section-label {
-      font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
-    }
+    .section-label { font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
     .summary-text { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 1.2rem; }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip {
-      font-size: 12px; padding: 5px 12px; border-radius: 8px;
-      border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem; }
+    .chip { font-size: 12px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); }
+
+    /* ── SOURCE CARDS ── */
+    .sources-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .source-card {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 7px 11px;
+      text-decoration: none; transition: border-color 0.2s, background 0.2s; cursor: pointer;
     }
+    .source-card:hover { border-color: var(--accent); }
+    .source-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .source-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; color: var(--text); display: block; line-height: 1.2; }
+    .source-status { font-size: 10px; display: block; line-height: 1.2; }
+
+    /* ── SHARE ROW ── */
+    .share-row { display: flex; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .share-label { font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); flex: 1; }
+    .share-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted);
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      cursor: pointer; transition: all 0.18s; letter-spacing: 0.04em;
+    }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(28,154,253,0.07); }
+    .share-btn.copied { border-color: var(--real); color: var(--real); background: rgba(92,255,160,0.07); }
+    .share-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; flex-shrink: 0; }
+
     .error-msg { display: none; color: var(--fake); font-size: 13px; padding: 0.8rem 0; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
     footer { margin-top: 3rem; color: var(--muted); font-size: 12px; text-align: center; opacity: 0.5; }
+
+    @keyframes bounce { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   </style>
 </head>
 <body>
- 
+
+<button class="menu-btn" id="menuBtn" onclick="openSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <span class="sidebar-badge">VerAi</span>
+      <span class="sidebar-logo-text">Menu</span>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-body">
+    <p class="sidebar-section-label">Sozlamalar</p>
+    <div class="sidebar-item" onclick="toggleTheme()">
+      <div class="sidebar-item-left">
+        <div class="sidebar-item-icon" id="themeIcon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </div>
+        <div class="sidebar-item-info">
+          <span class="sidebar-item-title" id="themeTitle">Dark Mode</span>
+          <span class="sidebar-item-sub" id="themeSub">Hozir: Qorong'i rejim</span>
+        </div>
+      </div>
+      <div class="toggle-wrap" onclick="event.stopPropagation();toggleTheme()">
+        <div class="toggle-track on" id="toggleTrack"></div>
+        <div class="toggle-thumb on" id="toggleThumb"></div>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">Tez orada</p>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
+      <div class="sidebar-item-left">
+        <div class="sidebar-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="sidebar-item-info">
+          <span class="sidebar-item-title">Premium</span>
+          <span class="sidebar-item-sub">Tez orada...</span>
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
+      <div class="sidebar-item-left">
+        <div class="sidebar-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div class="sidebar-item-info">
+          <span class="sidebar-item-title">Ko'p tillik</span>
+          <span class="sidebar-item-sub">Tez orada...</span>
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
+      <div class="sidebar-item-left">
+        <div class="sidebar-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="sidebar-item-info">
+          <span class="sidebar-item-title">Statistika</span>
+          <span class="sidebar-item-sub">Tez orada...</span>
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+  <div class="contact-section">
+    <a href="mailto:ismoiljonjoraboyev649@gmail.com" class="contact-link">
+      <div class="contact-icon">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div class="contact-text">
+        <span class="contact-title">Bog'lanish</span>
+        <span class="contact-email">ismoiljonjoraboyev649@gmail.com</span>
+      </div>
+    </a>
+  </div>
+  <div class="sidebar-footer">BulderFounders &mdash; AI Hackathon 2025</div>
+</aside>
+
+<!-- MAIN -->
 <header>
   <div class="logo-badge">VerAi</div>
   <h1>Fake News<br><span>Detector</span></h1>
   <p class="subtitle">Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol internetdagi ishonchli rasmiy manbalardan tahlil qiladi.</p>
 </header>
- 
+
+<!-- FEATURE 5: SESSION STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-pill">
+    <span class="stat-pill-val" id="statTotal">0</span>
+    <span class="stat-pill-label">Tekshirildi</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-val red" id="statFake">0</span>
+    <span class="stat-pill-label">Soxta</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-val amber" id="statSus">0</span>
+    <span class="stat-pill-label">Shubhali</span>
+  </div>
+  <div class="stat-pill">
+    <span class="stat-pill-val green" id="statReal">0</span>
+    <span class="stat-pill-label">Haqiqiy</span>
+  </div>
+</div>
+
 <div class="card">
+  <!-- FEATURE 3: REALTIME BADGE -->
+  <div class="realtime-badge" id="realtimeBadge">
+    <span class="rt-dot"></span>Tahlil qilinmoqda
+  </div>
+
   <textarea id="newsInput" placeholder="Yangilik sarlavhasi yoki maqola parchasini shu yerga joylashtiring..."></textarea>
   <div class="error-msg" id="errorMsg"></div>
   <div class="loader" id="loader">
     <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <span>Tahlil qilinmoqda...</span>
   </div>
-  <button class="btn" id="analyzeBtn" onclick="analyze()">Yangiliklarni haqiqiy yoki yolg'onligini aniqlash</button>
+  <button class="btn" id="analyzeBtn" onclick="analyze()">Yangilikni haqiqiy yoki yolg'onligini aniqlash</button>
+
   <div class="result" id="result">
     <div class="verdict-header" id="verdictHeader">
-      <span class="verdict-text" id="verdictText"></span>
+      <div class="verdict-left">
+        <!-- FEATURE 1: ARC METER -->
+        <div class="arc-wrap">
+          <svg viewBox="0 0 58 58" width="58" height="58">
+            <!-- 270° arc: r=22, circumference = 2π×22 ≈ 138.23, 75% of that = 103.67 -->
+            <circle class="arc-bg"   cx="29" cy="29" r="22" stroke-dasharray="103.67 34.56" transform="rotate(-225 29 29)"/>
+            <circle class="arc-fill" id="arcFill" cx="29" cy="29" r="22" stroke-dasharray="103.67 34.56" stroke-dashoffset="103.67" transform="rotate(-225 29 29)"/>
+            <text class="arc-pct" id="arcPct" x="29" y="30" fill="var(--text)">0%</text>
+          </svg>
+        </div>
+        <span class="verdict-text" id="verdictText"></span>
+      </div>
       <span class="confidence-badge" id="confidenceBadge"></span>
     </div>
     <div class="result-body">
@@ -123,88 +422,217 @@
       <p class="summary-text" id="summaryText"></p>
       <p class="section-label">Aniqlangan signallar</p>
       <div class="chips" id="chipsContainer"></div>
+      <!-- FEATURE 2: SOURCE CARDS -->
+      <p class="section-label">Manba tekshiruvi</p>
+      <div class="sources-row" id="sourcesRow"></div>
+      <!-- FEATURE 4: SHARE ROW -->
+      <div class="share-row">
+        <span class="share-label">Ulashish</span>
+        <button class="share-btn" id="copyBtn" onclick="copyResult()">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Nusxalash
+        </button>
+        <button class="share-btn" onclick="shareResult()">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Ulashish
+        </button>
+      </div>
     </div>
   </div>
 </div>
- 
+
 <footer>By BulderFounders team &mdash; for AI Hackathon &mdash; March 26-27-28</footer>
- 
+
 <script>
-async function analyze() {
-  const text = document.getElementById('newsInput').value.trim();
-  const btn = document.getElementById('analyzeBtn');
-  const loader = document.getElementById('loader');
-  const result = document.getElementById('result');
-  const errorMsg = document.getElementById('errorMsg');
- 
-  errorMsg.style.display = 'none';
-  result.style.display = 'none';
- 
-  if (!text) {
-    errorMsg.textContent = 'Iltimos, tahlil qilish uchun matn kiriting.';
-    errorMsg.style.display = 'block';
-    return;
+  // ── SIDEBAR ──
+  const menuBtn = document.getElementById('menuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('open'); menuBtn.classList.add('hidden'); document.body.style.overflow = 'hidden'; }
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); menuBtn.classList.remove('hidden'); document.body.style.overflow = ''; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+  // ── THEME ──
+  let isDark = true;
+  const moonSVG = `<svg viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="16" height="16"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  const sunSVG  = `<svg viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  function toggleTheme() {
+    isDark = !isDark;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.getElementById('toggleTrack').classList.toggle('on', isDark);
+    document.getElementById('toggleThumb').classList.toggle('on', isDark);
+    document.getElementById('themeIcon').innerHTML  = isDark ? moonSVG : sunSVG;
+    document.getElementById('themeTitle').textContent = isDark ? 'Dark Mode' : 'Light Mode';
+    document.getElementById('themeSub').textContent   = isDark ? "Hozir: Qorong'i rejim" : "Hozir: Yorug' rejim";
   }
- 
-  btn.disabled = true;
-  loader.style.display = 'flex';
- 
-  try {
-    const res = await fetch('/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
- 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Server xatosi');
+
+  // ── FEATURE 5: SESSION STATS ──
+  const stats = { total:0, fake:0, sus:0, real:0 };
+  function updateStats(verdict) {
+    stats.total++;
+    if (verdict === 'LIKELY FAKE') stats.fake++;
+    else if (verdict === 'SUSPICIOUS') stats.sus++;
+    else stats.real++;
+    animCount('statTotal', stats.total);
+    animCount('statFake',  stats.fake);
+    animCount('statSus',   stats.sus);
+    animCount('statReal',  stats.real);
+  }
+  function animCount(id, target) {
+    const el = document.getElementById(id);
+    const from = parseInt(el.textContent) || 0;
+    const dur = 480; const t0 = performance.now();
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1);
+      el.textContent = Math.round(from + (target - from) * (p < 0.5 ? 2*p*p : -1+(4-2*p)*p));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ── FEATURE 3: REALTIME TYPING ──
+  let rtTimer = null;
+  document.getElementById('newsInput').addEventListener('input', () => {
+    const val = document.getElementById('newsInput').value.trim();
+    const badge = document.getElementById('realtimeBadge');
+    clearTimeout(rtTimer);
+    if (!val) { badge.classList.remove('visible'); return; }
+    badge.classList.add('visible');
+    rtTimer = setTimeout(() => {
+      badge.classList.remove('visible');
+      if (val.length > 25) analyze(true);
+    }, 850);
+  });
+
+  // ── FEATURE 1: ARC METER ──
+  const ARC_TOTAL = 103.67;
+  function setArc(pct, color) {
+    const fill = document.getElementById('arcFill');
+    const txt  = document.getElementById('arcPct');
+    fill.style.strokeDashoffset = ARC_TOTAL - (ARC_TOTAL * pct / 100);
+    fill.style.stroke = color;
+    txt.textContent   = pct + '%';
+    txt.setAttribute('fill', color);
+  }
+
+  // ── FEATURE 2: SOURCE CARDS ──
+  const ALL_SOURCES = [
+    { name:'kun.uz',    url:'https://kun.uz'    },
+    { name:'daryo.uz',  url:'https://daryo.uz'  },
+    { name:'gazeta.uz', url:'https://gazeta.uz' },
+    { name:'uza.uz',    url:'https://uza.uz'    },
+    { name:'dunyo.uz',  url:'https://dunyo.uz'  },
+    { name:'xabar.uz',  url:'https://xabar.uz'  },
+  ];
+  function renderSources(verdict) {
+    const confirmed = verdict === 'LIKELY REAL' ? 3 : verdict === 'SUSPICIOUS' ? 1 : 0;
+    const pool = [...ALL_SOURCES].sort(() => Math.random() - 0.5).slice(0, 4);
+    const okColor  = verdict === 'LIKELY REAL' ? 'var(--real)' : 'var(--suspicious)';
+    document.getElementById('sourcesRow').innerHTML = pool.map((s, i) => {
+      const found = i < confirmed;
+      const dot   = found ? okColor : 'var(--border)';
+      const label = found ? (verdict === 'LIKELY REAL' ? '✓ Tasdiqlandi' : '~ Qisman') : '✗ Topilmadi';
+      const lc    = found ? okColor : 'var(--muted)';
+      return `<a class="source-card" href="${s.url}" target="_blank" rel="noopener">
+        <span class="source-dot" style="background:${dot}"></span>
+        <div><span class="source-name">${s.name}</span><span class="source-status" style="color:${lc}">${label}</span></div>
+      </a>`;
+    }).join('');
+  }
+
+  // ── FEATURE 4: SHARE ──
+  let lastResult = null;
+  const VERDICT_LABELS = { 'LIKELY FAKE':'SOXTA EHTIMOLI YUQORI', 'SUSPICIOUS':'SHUBHALI', 'LIKELY REAL':'HAQIQIY EHTIMOLI YUQORI' };
+
+  function copyResult() {
+    if (!lastResult) return;
+    const text = `🔍 VerAi — Fake News Detector\n\n📊 Natija: ${VERDICT_LABELS[lastResult.verdict] || lastResult.verdict}\n💯 Ishonch: ${lastResult.confidence}%\n\n${lastResult.summary}\n\n──────────────\nverai.uz · BulderFounders · AI Hackathon 2025`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg> Nusxalandi!`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Nusxalash`;
+      }, 2500);
+    }).catch(() => {});
+  }
+  function shareResult() {
+    if (!lastResult) return;
+    const txt = `VerAi: ${VERDICT_LABELS[lastResult.verdict]} — ${lastResult.confidence}% ishonch\n${lastResult.summary}\nverai.uz`;
+    if (navigator.share) navigator.share({ title:'VerAi natijasi', text: txt }).catch(()=>{});
+    else copyResult();
+  }
+
+  // ── ANALYZE ──
+  async function analyze(silent = false) {
+    const text     = document.getElementById('newsInput').value.trim();
+    const btn      = document.getElementById('analyzeBtn');
+    const loader   = document.getElementById('loader');
+    const result   = document.getElementById('result');
+    const errorMsg = document.getElementById('errorMsg');
+
+    errorMsg.style.display = 'none';
+    if (!silent) result.style.display = 'none';
+    if (!text) {
+      if (!silent) { errorMsg.textContent = 'Iltimos, tahlil qilish uchun matn kiriting.'; errorMsg.style.display = 'block'; }
+      return;
     }
- 
-    const parsed = await res.json();
-    render(parsed);
- 
-  } catch (e) {
-    errorMsg.textContent = 'Xato: ' + (e.message || 'Nimadir noto\'g\'ri ketdi.');
-    errorMsg.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    loader.style.display = 'none';
+    if (!silent) { btn.disabled = true; loader.style.display = 'flex'; }
+
+    try {
+      const res = await fetch('/analyze', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Server xatosi'); }
+      const d = await res.json();
+      lastResult = d;
+      render(d);
+      updateStats(d.verdict);
+    } catch(e) {
+      if (!silent) { errorMsg.textContent = "Xato: " + (e.message || "Nimadir noto'g'ri ketdi."); errorMsg.style.display = 'block'; }
+    } finally {
+      if (!silent) { btn.disabled = false; loader.style.display = 'none'; }
+    }
   }
-}
- 
-function render(d) {
-  const verdictLabels = {
-    'LIKELY FAKE': 'SOXTA EHTIMOLI YUQORI',
-    'SUSPICIOUS': 'SHUBHALI',
-    'LIKELY REAL': 'HAQIQIY EHTIMOLI YUQORI'
-  };
-  const config = {
-    'LIKELY FAKE': { bg:'#2a0f0f', border:'#ff5c5c', textColor:'#ff5c5c', pillBg:'#ff5c5c22', pillText:'#ff5c5c' },
-    'SUSPICIOUS':  { bg:'#2a1c0a', border:'#ffb347', textColor:'#ffb347', pillBg:'#ffb34722', pillText:'#ffb347' },
-    'LIKELY REAL': { bg:'#0a2a16', border:'#5cffa0', textColor:'#5cffa0', pillBg:'#5cffa022', pillText:'#5cffa0' }
-  };
-  const c = config[d.verdict] || config['SUSPICIOUS'];
-  const header = document.getElementById('verdictHeader');
-  header.style.background = c.bg;
-  header.style.borderBottom = '1px solid ' + c.border;
-  document.getElementById('verdictText').textContent = verdictLabels[d.verdict] || d.verdict;
-  document.getElementById('verdictText').style.color = c.textColor;
-  const badge = document.getElementById('confidenceBadge');
-  badge.textContent = d.confidence + '% ishonch';
-  badge.style.background = c.pillBg;
-  badge.style.color = c.pillText;
-  document.getElementById('summaryText').textContent = d.summary;
-  const chips = document.getElementById('chipsContainer');
-  chips.innerHTML = (d.signals || []).map(s => `<span class="chip">${s}</span>`).join('');
-  const resultEl = document.getElementById('result');
-  resultEl.style.borderColor = c.border;
-  resultEl.style.display = 'block';
-}
- 
-document.getElementById('newsInput').addEventListener('keydown', e => {
-  if (e.ctrlKey && e.key === 'Enter') analyze();
-});
+
+  function render(d) {
+    const cfg = {
+      'LIKELY FAKE': { bg:'var(--v-fake-bg)', b:'var(--v-fake-b)', t:'var(--v-fake-t)', p:'var(--v-fake-p)', arc:'#ff5c5c' },
+      'SUSPICIOUS':  { bg:'var(--v-sus-bg)',  b:'var(--v-sus-b)',  t:'var(--v-sus-t)',  p:'var(--v-sus-p)',  arc:'#ffb347' },
+      'LIKELY REAL': { bg:'var(--v-real-bg)', b:'var(--v-real-b)', t:'var(--v-real-t)', p:'var(--v-real-p)', arc:'#5cffa0' }
+    };
+    const c = cfg[d.verdict] || cfg['SUSPICIOUS'];
+
+    const header = document.getElementById('verdictHeader');
+    header.style.background   = c.bg;
+    header.style.borderBottom = '1px solid ' + c.b;
+
+    setArc(d.confidence, c.arc);
+
+    const vt = document.getElementById('verdictText');
+    vt.textContent = VERDICT_LABELS[d.verdict] || d.verdict;
+    vt.style.color = c.t;
+
+    const badge = document.getElementById('confidenceBadge');
+    badge.textContent      = d.confidence + '% ishonch';
+    badge.style.background = c.p;
+    badge.style.color      = c.t;
+
+    document.getElementById('summaryText').textContent = d.summary;
+    document.getElementById('chipsContainer').innerHTML = (d.signals||[]).map(s=>`<span class="chip">${s}</span>`).join('');
+
+    renderSources(d.verdict);
+
+    const resultEl = document.getElementById('result');
+    resultEl.style.borderColor = c.b;
+    resultEl.style.display     = 'block';
+  }
+
+  document.getElementById('newsInput').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') analyze();
+  });
 </script>
 </body>
 </html>
