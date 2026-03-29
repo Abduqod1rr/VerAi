@@ -18,6 +18,17 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABAS
 
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')  # set this in Render environment variables
 
+
+# ── Auth decorator ──────────────────────────────────────────────
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'access_token' not in session:
+            return jsonify({'error': 'Avtorizatsiya talab qilinadi'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route('/')
 def index():
     return send_from_directory('public', 'index.html')
