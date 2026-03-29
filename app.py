@@ -1,22 +1,29 @@
 from flask import Flask, request, jsonify, send_from_directory, session, redirect
 from functools import wraps
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import json
 import os
 from dotenv import load_dotenv
 from supabase import create_client
+from groq import Groq
 
 load_dotenv()
 
 app = Flask(__name__, static_folder='public')
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
 
-# Supabase setup
+# ── Supabase setup ──────────────────────────────────────────────
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
 
-GROQ_API_KEY = os.environ.get('GROQ_API_KEY')  # set this in Render environment variables
+# ── API Keys ────────────────────────────────────────────────────
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
+GOOGLE_FACTCHECK_API_KEY = os.environ.get('GOOGLE_FACTCHECK_API_KEY')
+
+# ── Groq client ─────────────────────────────────────────────────
+groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
 # ── Auth decorator ──────────────────────────────────────────────
@@ -29,6 +36,7 @@ def login_required(f):
     return decorated
 
 
+# ── Pages ───────────────────────────────────────────────────────
 @app.route('/')
 def index():
     return send_from_directory('public', 'index.html')
@@ -61,7 +69,6 @@ def register():
         })
 
         if res.user:
-            # If email confirmation is disabled, we get a session immediately
             if res.session:
                 session['access_token'] = res.session.access_token
                 session['refresh_token'] = res.session.refresh_token
@@ -72,7 +79,6 @@ def register():
                     'user': {'email': res.user.email, 'id': res.user.id}
                 }), 201
             else:
-                # Email confirmation is enabled
                 return jsonify({
                     'message': 'Ro\'yxatdan o\'tdingiz! Emailingizni tasdiqlang.',
                     'needs_confirmation': True
@@ -141,15 +147,101 @@ def me():
     }), 200
 
 
-# ── Analyze (protected) ────────────────────────────────────────
-@app.route('/analyze', methods=['POST'])
-@login_required
-def analyze():
-    data = request.get_json()
-    text = data.get('text', '').strip()
+# ═══════════════════════════════════════════════════════════════
+#  MULTI-AI ANALYSIS PIPELINE
+# ═══════════════════════════════════════════════════════════════
 
-    if not text:
-        return jsonify({'error': 'No text provided'}), 400
+def search_web_for_claim(text):
+    """
+    Step 1: Use Groq Compound model to search the web for the claim.
+    Returns search findings with real source URLs.
+    """
+    if not groq_client:
+        return None
+
+    try:
+        response = groq_client.chat.completions.create(
+            model='compound-beta',
+            max_tokens=1500,
+            messages=[
+                {
+                    'role': 'system',
+                    'content': (
+                        'You are a fact-checking research assistant. '
+                        'Search the web for the given news claim. '
+                        'Find relevant articles from news websites that confirm or deny this claim. '
+                        'Return ONLY a valid JSON object with NO markdown, NO backticks. '
+                        'Use this exact format: '
+                        '{"search_summary": "Brief summary of what you found in English", '
+                        '"sources": [{"url": "actual URL", "title": "article title", '
+                        '"status": "confirms" or "contradicts" or "related", '
+                        '"snippet": "relevant quote or summary from the source"}], '
+                        '"web_consensus": "confirmed" or "disputed" or "unverified"}'
+                    )
+                },
+                {
+                    'role': 'user',
+                    'content': f'Fact-check this news claim by searching the web:\n\n{text}'
+                }
+            ]
+        )
+
+        raw = response.choices[0].message.content
+        clean = raw.replace('```json', '').replace('```', '').strip()
+        return json.loads(clean)
+
+    except Exception as e:
+        print(f'[Step 1 - Web Search] Error: {e}')
+        return None
+
+
+def analyze_with_evidence(text, search_results):
+    """
+    Step 2: Use Llama 3.3 70B to deeply analyze the news
+    with the web search evidence from Step 1.
+    """
+    if not GROQ_API_KEY:
+        return None
+
+    # Build context from search results
+    evidence_context = ''
+    if search_results and search_results.get('sources'):
+        evidence_lines = []
+        for src in search_results['sources']:
+            status_label = {
+                'confirms': 'TASDIQLAYDI',
+                'contradicts': 'RAD ETADI',
+                'related': 'TEGISHLI'
+            }.get(src.get('status', ''), 'NOMA\'LUM')
+            evidence_lines.append(
+                f"- [{status_label}] {src.get('title', 'N/A')} ({src.get('url', '')})\n"
+                f"  {src.get('snippet', '')}"
+            )
+        evidence_context = '\n'.join(evidence_lines)
+        web_consensus = search_results.get('web_consensus', 'unverified')
+    else:
+        evidence_context = 'Internet qidiruvida natija topilmadi.'
+        web_consensus = 'unverified'
+
+    system_prompt = f"""You are a fake news detection expert. You have been given a news text AND real web search results about this claim.
+
+WEB SEARCH RESULTS:
+{evidence_context}
+
+WEB CONSENSUS: {web_consensus}
+
+Based on BOTH the news text analysis AND the web search evidence, return ONLY a valid JSON object.
+No preamble, no markdown, no backticks. Write summary and signals in Uzbek language.
+Use exactly these fields:
+{{"verdict": "LIKELY FAKE" or "SUSPICIOUS" or "LIKELY REAL",
+"confidence": integer 0-100,
+"summary": "2-5 jumladan iborat tushuntirish o'zbek tilida, internet qidiruv natijalariga asoslangan",
+"signals": ["3 dan 5 tagacha qisqa signal o'zbek tilida"]}}
+
+IMPORTANT: Base your verdict on the WEB EVIDENCE, not just your general knowledge.
+If web sources contradict the claim, it's likely fake.
+If web sources confirm the claim, it's likely real.
+If no evidence found, be cautious and mark as suspicious."""
 
     try:
         response = requests.post(
@@ -162,30 +254,165 @@ def analyze():
                 'model': 'llama-3.3-70b-versatile',
                 'max_tokens': 1000,
                 'messages': [
-                    {
-                        'role': 'system',
-                        'content': """You are a fake news detection expert. Analyze the given news text and return ONLY a valid JSON object. No preamble, no markdown, no backticks. Write summary and signals in Uzbek language. Use exactly these fields: {"verdict": "LIKELY FAKE" or "SUSPICIOUS" or "LIKELY REAL", "confidence": integer 0-100, "summary": "2-3 jumladan iborat tushuntirish o'zbek tilida", "signals": ["3 dan 5 tagacha qisqa signal o'zbek tilida"]}"""
-                    },
-                    {
-                        'role': 'user',
-                        'content': text
-                    }
+                    {'role': 'system', 'content': system_prompt},
+                    {'role': 'user', 'content': text}
                 ]
             }
         )
 
         if not response.ok:
             err = response.json()
-            return jsonify({'error': err.get('error', {}).get('message', 'Groq API error')}), 500
+            print(f'[Step 2 - Analysis] API Error: {err}')
+            return None
 
         result = response.json()
         raw = result['choices'][0]['message']['content']
         clean = raw.replace('```json', '').replace('```', '').strip()
-        parsed = json.loads(clean)
-        return jsonify(parsed)
+        return json.loads(clean)
+
+    except Exception as e:
+        print(f'[Step 2 - Analysis] Error: {e}')
+        return None
+
+
+def check_factcheck_db(text):
+    """
+    Step 3: Query Google Fact Check API to see if this claim
+    has already been fact-checked by organizations.
+    """
+    if not GOOGLE_FACTCHECK_API_KEY:
+        return []
+
+    try:
+        # Use first 200 chars as query (API has query length limits)
+        query = text[:200].strip()
+        response = requests.get(
+            'https://factchecktools.googleapis.com/v1alpha1/claims:search',
+            params={
+                'query': query,
+                'key': GOOGLE_FACTCHECK_API_KEY,
+                'languageCode': 'uz'  # Try Uzbek first
+            },
+            timeout=8
+        )
+
+        fact_checks = []
+
+        if response.ok:
+            data = response.json()
+            claims = data.get('claims', [])
+
+            for claim in claims[:5]:  # Max 5 results
+                for review in claim.get('claimReview', []):
+                    fact_checks.append({
+                        'claim': claim.get('text', ''),
+                        'publisher': review.get('publisher', {}).get('name', 'Noma\'lum'),
+                        'rating': review.get('textualRating', ''),
+                        'url': review.get('url', ''),
+                        'title': review.get('title', '')
+                    })
+
+        # If no Uzbek results, try without language filter
+        if not fact_checks:
+            response = requests.get(
+                'https://factchecktools.googleapis.com/v1alpha1/claims:search',
+                params={
+                    'query': query,
+                    'key': GOOGLE_FACTCHECK_API_KEY
+                },
+                timeout=8
+            )
+            if response.ok:
+                data = response.json()
+                for claim in data.get('claims', [])[:5]:
+                    for review in claim.get('claimReview', []):
+                        fact_checks.append({
+                            'claim': claim.get('text', ''),
+                            'publisher': review.get('publisher', {}).get('name', 'Noma\'lum'),
+                            'rating': review.get('textualRating', ''),
+                            'url': review.get('url', ''),
+                            'title': review.get('title', '')
+                        })
+
+        return fact_checks
+
+    except Exception as e:
+        print(f'[Step 3 - Fact Check] Error: {e}')
+        return []
+
+
+# ── Main Analyze Endpoint (protected) ──────────────────────────
+@app.route('/analyze', methods=['POST'])
+@login_required
+def analyze():
+    data = request.get_json()
+    text = data.get('text', '').strip()
+
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+
+    try:
+        # Run Step 3 (Google Fact Check) in parallel with Steps 1+2
+        fact_checks = []
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Start fact check in background
+            fact_check_future = executor.submit(check_factcheck_db, text)
+
+            # Step 1: Web search (must complete before Step 2)
+            search_results = search_web_for_claim(text)
+
+            # Step 2: Deep analysis with web evidence
+            analysis = analyze_with_evidence(text, search_results)
+
+            # Collect fact check results
+            try:
+                fact_checks = fact_check_future.result(timeout=10)
+            except Exception:
+                fact_checks = []
+
+        # ── Combine results ─────────────────────────────────────
+        if not analysis:
+            return jsonify({'error': 'Tahlil qilishda xatolik yuz berdi'}), 500
+
+        # Build real sources list from web search
+        sources = []
+        if search_results and search_results.get('sources'):
+            for src in search_results['sources']:
+                sources.append({
+                    'name': extract_domain(src.get('url', '')),
+                    'url': src.get('url', ''),
+                    'title': src.get('title', ''),
+                    'status': src.get('status', 'related'),
+                    'snippet': src.get('snippet', '')
+                })
+
+        # Build final response
+        result = {
+            'verdict': analysis.get('verdict', 'SUSPICIOUS'),
+            'confidence': analysis.get('confidence', 50),
+            'summary': analysis.get('summary', ''),
+            'signals': analysis.get('signals', []),
+            'sources': sources,
+            'fact_checks': fact_checks,
+            'web_consensus': search_results.get('web_consensus', 'unverified') if search_results else 'unverified'
+        }
+
+        return jsonify(result)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+def extract_domain(url):
+    """Extract clean domain name from URL."""
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        domain = parsed.netloc or parsed.path
+        domain = domain.replace('www.', '')
+        return domain
+    except Exception:
+        return url
 
 
 if __name__ == '__main__':

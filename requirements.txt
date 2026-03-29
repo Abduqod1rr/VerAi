@@ -2,3 +2,4 @@ flask
 requests
 supabase
 python-dotenv
+groq

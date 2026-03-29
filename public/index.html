@@ -185,11 +185,33 @@
     .chip { font-size: 12px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); }
 
     .sources-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.2rem; }
-    .source-card { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 7px 11px; text-decoration: none; transition: border-color 0.2s, background 0.2s; cursor: pointer; }
+    .source-card { display: flex; align-items: flex-start; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; text-decoration: none; transition: border-color 0.2s, background 0.2s; cursor: pointer; max-width: 100%; min-width: 0; }
     .source-card:hover { border-color: var(--accent); }
-    .source-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .source-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; color: var(--text); display: block; line-height: 1.2; }
-    .source-status { font-size: 10px; display: block; line-height: 1.2; }
+    .source-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .source-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; color: var(--text); display: block; line-height: 1.3; }
+    .source-title { font-size: 11px; color: var(--muted); display: block; line-height: 1.3; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+    .source-status { font-size: 10px; display: block; line-height: 1.2; margin-top: 2px; }
+    .no-sources { font-size: 13px; color: var(--muted); font-style: italic; }
+
+    /* Fact check cards */
+    .factcheck-section { margin-bottom: 1.2rem; }
+    .factcheck-card { display: flex; align-items: flex-start; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; text-decoration: none; transition: border-color 0.2s; }
+    .factcheck-card:hover { border-color: var(--accent); }
+    .fc-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+    .fc-icon.false { background: rgba(255,92,92,0.15); color: var(--fake); }
+    .fc-icon.true { background: rgba(92,255,160,0.15); color: var(--real); }
+    .fc-icon.mixed { background: rgba(255,179,71,0.15); color: var(--suspicious); }
+    .fc-info { min-width: 0; flex: 1; }
+    .fc-publisher { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--text); }
+    .fc-rating { font-size: 11px; font-weight: 600; margin-left: 6px; }
+    .fc-claim { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Multi-step loader */
+    .loader-steps { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+    .loader-step { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .loader-step.active { color: var(--accent); }
+    .loader-step.done { color: var(--real); }
+    .step-icon { width: 14px; text-align: center; }
 
     .share-row { display: flex; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
     .share-label { font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); flex: 1; }
@@ -320,7 +342,14 @@
   <div class="error-msg" id="errorMsg"></div>
   <div class="loader" id="loader">
     <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <span>Tahlil qilinmoqda...</span>
+    <div>
+      <span>AI tahlil qilmoqda...</span>
+      <div class="loader-steps">
+        <div class="loader-step active" id="step1"><span class="step-icon">🔍</span> Internetdan qidirilmoqda...</div>
+        <div class="loader-step" id="step2"><span class="step-icon">🧠</span> Chuqur tahlil qilinmoqda...</div>
+        <div class="loader-step" id="step3"><span class="step-icon">✅</span> Fact-check bazasi tekshirilmoqda...</div>
+      </div>
+    </div>
   </div>
   <button class="btn" id="analyzeBtn" onclick="analyze()">Yangilikni haqiqiy yoki yolg'onligini aniqlash</button>
   <div class="result" id="result">
@@ -342,8 +371,12 @@
       <p class="summary-text" id="summaryText"></p>
       <p class="section-label">Aniqlangan signallar</p>
       <div class="chips" id="chipsContainer"></div>
-      <p class="section-label">Manba tekshiruvi</p>
+      <p class="section-label">Internet manbalari</p>
       <div class="sources-row" id="sourcesRow"></div>
+      <div class="factcheck-section" id="factcheckSection" style="display:none;">
+        <p class="section-label">Fact-check natijalari</p>
+        <div id="factcheckRow"></div>
+      </div>
       <div class="share-row">
         <span class="share-label">Ulashish</span>
         <button class="share-btn" id="copyBtn" onclick="copyResult()">
@@ -412,7 +445,6 @@
     badge.classList.add('visible');
     rtTimer = setTimeout(() => {
       badge.classList.remove('visible');
-      if (val.length > 25) analyze(true);
     }, 850);
   });
 
@@ -426,21 +458,47 @@
     txt.setAttribute('fill', color);
   }
 
-  const ALL_SOURCES = [
-    { name:'kun.uz', url:'https://kun.uz' }, { name:'daryo.uz', url:'https://daryo.uz' },
-    { name:'gazeta.uz', url:'https://gazeta.uz' }, { name:'uza.uz', url:'https://uza.uz' },
-    { name:'dunyo.uz', url:'https://dunyo.uz' }, { name:'xabar.uz', url:'https://xabar.uz' },
-  ];
-  function renderSources(verdict) {
-    const confirmed = verdict === 'LIKELY REAL' ? 3 : verdict === 'SUSPICIOUS' ? 1 : 0;
-    const pool = [...ALL_SOURCES].sort(() => Math.random() - 0.5).slice(0, 4);
-    const okColor = verdict === 'LIKELY REAL' ? 'var(--real)' : 'var(--suspicious)';
-    document.getElementById('sourcesRow').innerHTML = pool.map((s, i) => {
-      const found = i < confirmed;
-      const dot   = found ? okColor : 'var(--border)';
-      const label = found ? (verdict === 'LIKELY REAL' ? '✓ Tasdiqlandi' : '~ Qisman') : '✗ Topilmadi';
-      const lc    = found ? okColor : 'var(--muted)';
-      return `<a class="source-card" href="${s.url}" target="_blank" rel="noopener"><span class="source-dot" style="background:${dot}"></span><div><span class="source-name">${s.name}</span><span class="source-status" style="color:${lc}">${label}</span></div></a>`;
+  function renderSources(sources) {
+    const row = document.getElementById('sourcesRow');
+    if (!sources || sources.length === 0) {
+      row.innerHTML = '<span class="no-sources">Internet manbalar topilmadi</span>';
+      return;
+    }
+    const statusConfig = {
+      'confirms':    { dot: 'var(--real)',       label: '✓ Tasdiqlaydi',  color: 'var(--real)' },
+      'contradicts': { dot: 'var(--fake)',       label: '✗ Rad etadi',   color: 'var(--fake)' },
+      'related':     { dot: 'var(--suspicious)', label: '~ Tegishli',    color: 'var(--suspicious)' }
+    };
+    row.innerHTML = sources.map(s => {
+      const cfg = statusConfig[s.status] || statusConfig['related'];
+      const title = s.title ? `<span class="source-title" title="${s.title}">${s.title}</span>` : '';
+      return `<a class="source-card" href="${s.url}" target="_blank" rel="noopener">
+        <span class="source-dot" style="background:${cfg.dot}"></span>
+        <div><span class="source-name">${s.name}</span>${title}
+        <span class="source-status" style="color:${cfg.color}">${cfg.label}</span></div></a>`;
+    }).join('');
+  }
+
+  function renderFactChecks(checks) {
+    const section = document.getElementById('factcheckSection');
+    const row = document.getElementById('factcheckRow');
+    if (!checks || checks.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    row.innerHTML = checks.map(fc => {
+      const rating = (fc.rating || '').toLowerCase();
+      let iconClass = 'mixed';
+      let icon = '⚠️';
+      if (rating.includes('false') || rating.includes('fake') || rating.includes('pants')) { iconClass = 'false'; icon = '✗'; }
+      else if (rating.includes('true') || rating.includes('correct')) { iconClass = 'true'; icon = '✓'; }
+      return `<a class="factcheck-card" href="${fc.url}" target="_blank" rel="noopener">
+        <div class="fc-icon ${iconClass}">${icon}</div>
+        <div class="fc-info">
+          <div><span class="fc-publisher">${fc.publisher}</span><span class="fc-rating" style="color:var(--${iconClass === 'false' ? 'fake' : iconClass === 'true' ? 'real' : 'suspicious'})">${fc.rating}</span></div>
+          <div class="fc-claim" title="${fc.claim}">${fc.claim}</div>
+        </div></a>`;
     }).join('');
   }
 
@@ -467,6 +525,26 @@
     else copyResult();
   }
 
+  let stepInterval = null;
+  function animateSteps() {
+    const steps = ['step1','step2','step3'];
+    let idx = 0;
+    steps.forEach(s => { document.getElementById(s).className = 'loader-step'; });
+    document.getElementById(steps[0]).classList.add('active');
+    stepInterval = setInterval(() => {
+      if (idx < steps.length) document.getElementById(steps[idx]).classList.replace('active','done');
+      idx++;
+      if (idx < steps.length) document.getElementById(steps[idx]).classList.add('active');
+      else clearInterval(stepInterval);
+    }, 3000);
+  }
+  function stopSteps() {
+    if (stepInterval) clearInterval(stepInterval);
+    ['step1','step2','step3'].forEach(s => {
+      document.getElementById(s).className = 'loader-step done';
+    });
+  }
+
   async function analyze(silent = false) {
     const text     = document.getElementById('newsInput').value.trim();
     const btn      = document.getElementById('analyzeBtn');
@@ -479,7 +557,7 @@
       if (!silent) { errorMsg.textContent = 'Iltimos, tahlil qilish uchun matn kiriting.'; errorMsg.style.display = 'block'; }
       return;
     }
-    if (!silent) { btn.disabled = true; loader.style.display = 'flex'; }
+    if (!silent) { btn.disabled = true; loader.style.display = 'flex'; animateSteps(); }
     try {
       const res = await fetch('/analyze', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ text }) });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Server xatosi'); }
@@ -488,7 +566,7 @@
     } catch(e) {
       if (!silent) { errorMsg.textContent = "Xato: " + (e.message || "Nimadir noto'g'ri ketdi."); errorMsg.style.display = 'block'; }
     } finally {
-      if (!silent) { btn.disabled = false; loader.style.display = 'none'; }
+      if (!silent) { stopSteps(); btn.disabled = false; loader.style.display = 'none'; }
     }
   }
 
@@ -512,7 +590,8 @@
     badge.style.color = c.t;
     document.getElementById('summaryText').textContent = d.summary;
     document.getElementById('chipsContainer').innerHTML = (d.signals||[]).map(s=>`<span class="chip">${s}</span>`).join('');
-    renderSources(d.verdict);
+    renderSources(d.sources || []);
+    renderFactChecks(d.fact_checks || []);
     const resultEl = document.getElementById('result');
     resultEl.style.borderColor = c.b;
     resultEl.style.display = 'block';
