@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VerAi — Fake News Detector</title>
-  <link rel="icon" type="image/png" href="Group 28.png">
+  <link rel="icon" type="image/png" href="VerAi.png">
   <link
     href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@400;500&display=swap"
     rel="stylesheet" />
@@ -89,13 +89,13 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width:600px) {
       body {
         padding: 1.5rem 1rem 2rem;
       }
     }
 
-    /* User avatar button */
+    /* ── User button ── */
     .user-btn {
       position: fixed;
       top: 18px;
@@ -126,10 +126,12 @@
       box-shadow: 0 4px 20px rgba(28, 154, 253, 0.4);
     }
 
+    /* ── Menu button ── */
     .menu-btn {
       position: fixed;
       top: 18px;
-      left: 18px;
+      left:
+        18px;
       z-index: 800;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -147,7 +149,8 @@
     }
 
     .menu-btn:hover {
-      background: var(--surface2);
+      background:
+        var(--surface2);
       border-color: var(--accent);
     }
 
@@ -165,6 +168,7 @@
       transform: translateX(-10px) scale(0.88);
     }
 
+    /* ── Overlay ── */
     .overlay {
       position: fixed;
       inset: 0;
@@ -180,12 +184,13 @@
       pointer-events: all;
     }
 
+    /* ── Sidebar ── */
     .sidebar {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
-      width: 300px;
+      width: 320px;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
       z-index: 950;
@@ -321,6 +326,7 @@
       justify-content: center;
       flex-shrink: 0;
       transition: background 0.2s;
+      font-size: 18px;
     }
 
     .sidebar-item:hover .sidebar-item-icon {
@@ -354,6 +360,7 @@
       line-height: 1;
     }
 
+    /* ── Toggle switch ── */
     .toggle-wrap {
       position: relative;
       width: 44px;
@@ -390,6 +397,7 @@
       transform: translateX(20px);
     }
 
+    /* ── Contact ── */
     .contact-section {
       padding: 12px;
       border-top: 1px solid var(--border);
@@ -460,76 +468,7 @@
       flex-shrink: 0;
     }
 
-    /* STATS BAR */
-    .stats-bar {
-      width: 100%;
-      max-width: 700px;
-      margin-bottom: 1.4rem;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    @media (max-width: 480px) {
-      .stats-bar {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 1rem;
-      }
-    }
-
-    .stat-pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 11px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: background 0.3s, border-color 0.3s;
-    }
-
-    @media (max-width: 480px) {
-      .stat-pill {
-        padding: 10px 12px;
-      }
-    }
-
-    .stat-pill-val {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-    }
-
-    @media (max-width: 360px) {
-      .stat-pill-val {
-        font-size: 1.1rem;
-      }
-    }
-
-    .stat-pill-val.red {
-      color: var(--fake);
-    }
-
-    .stat-pill-val.amber {
-      color: var(--suspicious);
-    }
-
-    .stat-pill-val.green {
-      color: var(--real);
-    }
-
-    .stat-pill-label {
-      font-size: 10px;
-      color: var(--muted);
-      font-family: 'Syne', sans-serif;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
+    /* ── Main content ── */
     header {
       text-align: center;
       margin-bottom: 2rem;
@@ -597,6 +536,7 @@
       }
     }
 
+    /* ── Realtime badge ── */
     .realtime-badge {
       position: absolute;
       top: 16px;
@@ -636,12 +576,12 @@
       0%,
       100% {
         opacity: 1;
-        transform: scale(1)
+        transform: scale(1);
       }
 
       50% {
         opacity: 0.35;
-        transform: scale(0.65)
+        transform: scale(0.65);
       }
     }
 
@@ -747,6 +687,35 @@
       animation-delay: 0.4s;
     }
 
+    .loader-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .loader-step {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loader-step.active {
+      color: var(--accent);
+    }
+
+    .loader-step.done {
+      color: var(--real);
+    }
+
+    .step-icon {
+      width: 14px;
+      text-align: center;
+    }
+
+    /* ── Result ── */
     .result {
       display: none;
       margin-top: 1.5rem;
@@ -844,7 +813,7 @@
 
     @media (max-width: 480px) {
       .result-body {
-        padding: 14px 14px;
+        padding: 14px;
       }
     }
 
@@ -903,10 +872,8 @@
       border-radius: 10px;
       padding: 9px 12px;
       text-decoration: none;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.2s;
       cursor: pointer;
-      max-width: 100%;
-      min-width: 0;
     }
 
     .source-card:hover {
@@ -955,7 +922,6 @@
       font-style: italic;
     }
 
-    /* Fact check cards */
     .factcheck-section {
       margin-bottom: 1.2rem;
     }
@@ -1029,35 +995,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    /* Multi-step loader */
-    .loader-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 6px;
-    }
-
-    .loader-step {
-      font-size: 11px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .loader-step.active {
-      color: var(--accent);
-    }
-
-    .loader-step.done {
-      color: var(--real);
-    }
-
-    .step-icon {
-      width: 14px;
-      text-align: center;
     }
 
     .share-row {
@@ -1139,24 +1076,24 @@
       80%,
       100% {
         transform: scale(0.5);
-        opacity: 0.3
+        opacity: 0.3;
       }
 
       40% {
         transform: scale(1);
-        opacity: 1
+        opacity: 1;
       }
     }
 
     @keyframes fadeUp {
       from {
         opacity: 0;
-        transform: translateY(16px)
+        transform: translateY(16px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0)
+        transform: translateY(0);
       }
     }
   </style>
@@ -1170,11 +1107,12 @@
   <button class="user-btn" id="userBtn" onclick="openSidebar()" title="Profil"></button>
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
+  <!-- ══ SIDEBAR ══ -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <span class="sidebar-badge">VerAi</span>
-        <span class="sidebar-logo-text">Menu</span>
+        <span class="sidebar-logo-text" id="sbMenuLabel">Menu</span>
       </div>
       <button class="sidebar-close" onclick="closeSidebar()">
         <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1182,8 +1120,10 @@
         </svg>
       </button>
     </div>
+
     <div class="sidebar-body">
-      <p class="sidebar-section-label">Foydalanuvchi</p>
+      <!-- User section -->
+      <p class="sidebar-section-label" id="sbSecUser">Foydalanuvchi</p>
       <div class="sidebar-item" style="cursor:default;">
         <div class="sidebar-item-left">
           <div class="sidebar-item-icon" style="background:var(--accent);border-color:var(--accent);">
@@ -1195,11 +1135,11 @@
           </div>
           <div class="sidebar-item-info">
             <span class="sidebar-item-title" id="userEmail">Foydalanuvchi</span>
-            <span class="sidebar-item-sub">Tizimga kirgan</span>
+            <span class="sidebar-item-sub" id="sbLoggedIn">Tizimga kirgan</span>
           </div>
         </div>
       </div>
-      <div class="sidebar-item" onclick="handleLogout()" style="cursor:pointer;">
+      <div class="sidebar-item" onclick="handleLogout()">
         <div class="sidebar-item-left">
           <div class="sidebar-item-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"
@@ -1210,8 +1150,8 @@
             </svg>
           </div>
           <div class="sidebar-item-info">
-            <span class="sidebar-item-title" style="color:var(--fake);">Chiqish</span>
-            <span class="sidebar-item-sub">Tizimdan chiqish</span>
+            <span class="sidebar-item-title" id="sbLogout" style="color:var(--fake);">Chiqish</span>
+            <span class="sidebar-item-sub" id="sbLogoutSub">Tizimdan chiqish</span>
           </div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"
@@ -1219,8 +1159,13 @@
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </div>
+
       <div class="sidebar-divider"></div>
-      <p class="sidebar-section-label">Sozlamalar</p>
+
+      <!-- Settings section -->
+      <p class="sidebar-section-label" id="sbSecSettings">Sozlamalar</p>
+
+      <!-- Dark/Light mode -->
       <div class="sidebar-item" onclick="toggleTheme()">
         <div class="sidebar-item-left">
           <div class="sidebar-item-icon" id="themeIcon">
@@ -1239,17 +1184,39 @@
           <div class="toggle-thumb on" id="toggleThumb"></div>
         </div>
       </div>
+
+      <!-- Language selector — ACTIVE -->
+      <div class="sidebar-item" onclick="window.location.href='languages.html'">
+        <div class="sidebar-item-left">
+          <div class="sidebar-item-icon" id="langFlagIcon" style="font-size:18px;">🇺🇿</div>
+          <div class="sidebar-item-info">
+            <span class="sidebar-item-title" id="sbLangTitle">Til</span>
+            <span class="sidebar-item-sub" id="sbLangSub">O'zbek tili</span>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </div>
+
       <div class="sidebar-divider"></div>
-      <p class="sidebar-section-label">Tez orada</p>
+
+      <!-- Coming soon features -->
+      <p class="sidebar-section-label" id="sbSecFeatures">Funksiyalar</p>
       <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
         <div class="sidebar-item-left">
-          <div class="sidebar-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
+          <div class="sidebar-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
               <polygon
                 points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg></div>
-          <div class="sidebar-item-info"><span class="sidebar-item-title">Premium</span><span
-              class="sidebar-item-sub">Tez orada...</span></div>
+            </svg>
+          </div>
+          <div class="sidebar-item-info">
+            <span class="sidebar-item-title" id="sbPremium">Premium</span>
+            <span class="sidebar-item-sub" id="sbComingSoon1">Tez orada...</span>
+          </div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -1258,30 +1225,18 @@
       </div>
       <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
         <div class="sidebar-item-left">
-          <div class="sidebar-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg></div>
-          <div class="sidebar-item-info"><span class="sidebar-item-title">Ko'p tillik</span><span
-              class="sidebar-item-sub">Tez orada...</span></div>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </div>
-      <div class="sidebar-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
-        <div class="sidebar-item-left">
-          <div class="sidebar-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
+          <div class="sidebar-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
               <line x1="18" y1="20" x2="18" y2="10" />
               <line x1="12" y1="20" x2="12" y2="4" />
               <line x1="6" y1="20" x2="6" y2="14" />
-            </svg></div>
-          <div class="sidebar-item-info"><span class="sidebar-item-title">Statistika</span><span
-              class="sidebar-item-sub">Tez orada...</span></div>
+            </svg>
+          </div>
+          <div class="sidebar-item-info">
+            <span class="sidebar-item-title" id="sbStats">Statistika</span>
+            <span class="sidebar-item-sub" id="sbComingSoon2">Tez orada...</span>
+          </div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -1289,42 +1244,35 @@
         </svg>
       </div>
     </div>
+
     <div class="contact-section">
       <a href="mailto:ismoiljonjoraboyev649@gmail.com" class="contact-link">
-        <div class="contact-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
             <polyline points="22,6 12,13 2,6" />
-          </svg></div>
+          </svg>
+        </div>
         <div class="contact-text">
-          <span class="contact-title">Bog'lanish</span>
+          <span class="contact-title" id="sbContact">Bog'lanish</span>
           <span class="contact-email">ismoiljonjoraboyev649@gmail.com</span>
         </div>
       </a>
     </div>
-    <div class="sidebar-footer">BulderFounders &mdash; AI Hackathon 2025</div>
+    <div class="sidebar-footer">VerAi&mdash;Since 2026</div>
   </aside>
 
+  <!-- ══ MAIN ══ -->
   <header>
     <div class="logo-badge">VerAi</div>
-    <h1>Fake News<br><span>Detector</span></h1>
-    <p class="subtitle">Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol internetdagi
-      ishonchli rasmiy manbalardan tahlil qiladi.</p>
+    <h1 id="mainTitle">Fake News<br><span id="mainTitleAccent">Detector</span></h1>
+    <p class="subtitle" id="mainSubtitle">Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni
+      darhol internetdagi ishonchli rasmiy manbalardan tahlil qiladi.</p>
   </header>
 
-  <div class="stats-bar">
-    <div class="stat-pill"><span class="stat-pill-val" id="statTotal">0</span><span
-        class="stat-pill-label">Tekshirildi</span></div>
-    <div class="stat-pill"><span class="stat-pill-val red" id="statFake">0</span><span
-        class="stat-pill-label">Soxta</span></div>
-    <div class="stat-pill"><span class="stat-pill-val amber" id="statSus">0</span><span
-        class="stat-pill-label">Shubhali</span></div>
-    <div class="stat-pill"><span class="stat-pill-val green" id="statReal">0</span><span
-        class="stat-pill-label">Haqiqiy</span></div>
-  </div>
-
   <div class="card">
-    <div class="realtime-badge" id="realtimeBadge"><span class="rt-dot"></span>Tahlil qilinmoqda</div>
+    <div class="realtime-badge" id="realtimeBadge"><span class="rt-dot"></span><span id="rtText">Tahlil
+        qilinmoqda</span></div>
     <textarea id="newsInput"
       placeholder="Yangilik sarlavhasi yoki maqola parchasini shu yerga joylashtiring..."></textarea>
     <div class="error-msg" id="errorMsg"></div>
@@ -1335,15 +1283,19 @@
         <div class="dot"></div>
       </div>
       <div>
-        <span>AI tahlil qilmoqda...</span>
+        <span id="loaderText">AI tahlil qilmoqda...</span>
         <div class="loader-steps">
-          <div class="loader-step active" id="step1"><span class="step-icon"></span> Internetdan qidirilmoqda...</div>
-          <div class="loader-step" id="step2"><span class="step-icon"></span> Chuqur tahlil qilinmoqda...</div>
-          <div class="loader-step" id="step3"><span class="step-icon"></span> Fact-check bazasi tekshirilmoqda...</div>
+          <div class="loader-step active" id="step1"><span class="step-icon"></span> <span id="step1Text">Internetdan
+              qidirilmoqda...</span></div>
+          <div class="loader-step" id="step2"><span class="step-icon"></span> <span id="step2Text">Chuqur tahlil
+              qilinmoqda...</span></div>
+          <div class="loader-step" id="step3"><span class="step-icon"></span> <span id="step3Text">Fact-check bazasi
+              tekshirilmoqda...</span></div>
         </div>
       </div>
     </div>
-    <button class="btn" id="analyzeBtn" onclick="analyze()">Yangilikni haqiqiy yoki yolg'onligini aniqlash</button>
+    <button class="btn" id="analyzeBtn" onclick="analyze()">Ma'lumotni tahlil qilish</button>
+
     <div class="result" id="result">
       <div class="verdict-header" id="verdictHeader">
         <div class="verdict-left">
@@ -1361,24 +1313,24 @@
         <span class="confidence-badge" id="confidenceBadge"></span>
       </div>
       <div class="result-body">
-        <p class="section-label">Tahlil</p>
+        <p class="section-label" id="lblAnalysis">Tahlil</p>
         <p class="summary-text" id="summaryText"></p>
-        <p class="section-label">Aniqlangan signallar</p>
+        <p class="section-label" id="lblSignals">Aniqlangan signallar</p>
         <div class="chips" id="chipsContainer"></div>
-        <p class="section-label">Internet manbalari</p>
+        <p class="section-label" id="lblSources">Internet manbalari</p>
         <div class="sources-row" id="sourcesRow"></div>
         <div class="factcheck-section" id="factcheckSection" style="display:none;">
-          <p class="section-label">Fact-check natijalari</p>
+          <p class="section-label" id="lblFactCheck">Fact-check natijalari</p>
           <div id="factcheckRow"></div>
         </div>
         <div class="share-row">
-          <span class="share-label">Ulashish</span>
+          <span class="share-label" id="lblShare">Ulashish</span>
           <button class="share-btn" id="copyBtn" onclick="copyResult()">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" />
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
-            Nusxalash
+            <span id="copyBtnText">Nusxalash</span>
           </button>
           <button class="share-btn" onclick="shareResult()">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1388,57 +1340,364 @@
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
             </svg>
-            Ulashish
+            <span id="shareBtnText">Ulashish</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <footer>By BulderFounders team &mdash; for AI Hackathon &mdash; March 26-27-28</footer>
+  <footer id="mainFooter">VerAi team &mdash; Since 2026</footer>
 
   <script>
+    // ══════════════════════════════════════════════════════════════
+    // TRANSLATIONS
+    // To add a new language: add a new entry to TRANSLATIONS object
+    // ══════════════════════════════════════════════════════════════
+    const LANG_META = {
+      uz: { flag: '🇺🇿', name: "O'zbek tili" },
+      en: { flag: '🇬🇧', name: 'English' },
+      ru: { flag: '🇷🇺', name: 'Русский' },
+      ja: { flag: '🇯🇵', name: '日本語' },
+      zh: { flag: '🇨🇳', name: '中文' },
+    };
+
+    const TRANSLATIONS = {
+      uz: {
+        mainTitle: 'Fake News',
+        mainTitleAccent: 'Detector',
+        mainSubtitle: "Yangilik, tahmin yoki maqola matnini joylashtiring. Sun'iy intellekt uni darhol internetdagi ishonchli rasmiy manbalardan tahlil qiladi.",
+        placeholder: "Yangilik sarlavhasi yoki maqola parchasini shu yerga joylashtiring...",
+        analyzeBtn: "Ma'lumotni tahlil qilish",
+        loaderText: "AI tahlil qilmoqda...",
+        step1: "Internetdan qidirilmoqda...",
+        step2: "Chuqur tahlil qilinmoqda...",
+        step3: "Fact-check bazasi tekshirilmoqda...",
+        rtBadge: "Tahlil qilinmoqda",
+        lblAnalysis: "Tahlil",
+        lblSignals: "Aniqlangan signallar",
+        lblSources: "Internet manbalari",
+        lblFactCheck: "Fact-check natijalari",
+        lblShare: "Ulashish",
+        copyBtn: "Nusxalash",
+        copiedBtn: "Nusxalandi!",
+        shareBtn: "Ulashish",
+        verdictFake: "SOXTA EHTIMOLI YUQORI",
+        verdictSus: "SHUBHALI",
+        verdictReal: "HAQIQIY EHTIMOLI YUQORI",
+        confidence: "% ishonch",
+        noSources: "Internet manbalar topilmadi",
+        errorEmpty: "Iltimos, tahlil qilish uchun matn kiriting.",
+        errorGeneral: "Nimadir noto'g'ri ketdi.",
+        sbMenuLabel: "Menu",
+        sbSecUser: "Foydalanuvchi",
+        sbLoggedIn: "Tizimga kirgan",
+        sbLogout: "Chiqish",
+        sbLogoutSub: "Tizimdan chiqish",
+        sbSecSettings: "Sozlamalar",
+        sbLangTitle: "Til",
+        sbSecFeatures: "Funksiyalar",
+        sbPremium: "Premium",
+        sbComingSoon: "Tez orada...",
+        sbStats: "Statistika",
+        sbContact: "Bog'lanish",
+        darkMode: "Dark Mode",
+        lightMode: "Light Mode",
+        darkModeSub: "Hozir: Qorong'i rejim",
+        lightModeSub: "Hozir: Yorug' rejim",
+        footer: "VerAi team — Since 2026",
+        shareClipboard: "🔍 VerAi — Fake News Detector\n\n📊 Natija: {verdict}\n💯 Ishonch: {pct}%\n\n{summary}\n\n──────────────\nverai.uz · VerAi",
+        srcConfirms: "✓ Tasdiqlaydi",
+        srcContradicts: "✗ Rad etadi",
+        srcRelated: "~ Tegishli",
+      },
+      en: {
+        mainTitle: 'Fake News',
+        mainTitleAccent: 'Detector',
+        mainSubtitle: "Paste a news headline or article. AI instantly analyzes it against trusted official sources on the internet.",
+        placeholder: "Paste a news headline or article fragment here...",
+        analyzeBtn: "Analyze Content",
+        loaderText: "AI is analyzing...",
+        step1: "Searching the internet...",
+        step2: "Deep analysis in progress...",
+        step3: "Checking fact-check database...",
+        rtBadge: "Analyzing",
+        lblAnalysis: "Analysis",
+        lblSignals: "Detected signals",
+        lblSources: "Internet sources",
+        lblFactCheck: "Fact-check results",
+        lblShare: "Share",
+        copyBtn: "Copy",
+        copiedBtn: "Copied!",
+        shareBtn: "Share",
+        verdictFake: "LIKELY FAKE",
+        verdictSus: "SUSPICIOUS",
+        verdictReal: "LIKELY REAL",
+        confidence: "% confidence",
+        noSources: "No internet sources found",
+        errorEmpty: "Please enter text to analyze.",
+        errorGeneral: "Something went wrong.",
+        sbMenuLabel: "Menu",
+        sbSecUser: "User",
+        sbLoggedIn: "Logged in",
+        sbLogout: "Sign out",
+        sbLogoutSub: "Log out of system",
+        sbSecSettings: "Settings",
+        sbLangTitle: "Language",
+        sbSecFeatures: "Features",
+        sbPremium: "Premium",
+        sbComingSoon: "Coming soon...",
+        sbStats: "Statistics",
+        sbContact: "Contact",
+        darkMode: "Dark Mode",
+        lightMode: "Light Mode",
+        darkModeSub: "Now: Dark mode",
+        lightModeSub: "Now: Light mode",
+        footer: "VerAi team — Since 2026",
+        shareClipboard: "🔍 VerAi — Fake News Detector\n\n📊 Result: {verdict}\n💯 Confidence: {pct}%\n\n{summary}\n\n──────────────\nverai.uz · BulderFounders",
+        srcConfirms: "✓ Confirms",
+        srcContradicts: "✗ Contradicts",
+        srcRelated: "~ Related",
+      },
+      ru: {
+        mainTitle: 'Fake News',
+        mainTitleAccent: 'Detector',
+        mainSubtitle: "Вставьте заголовок новости или статью. ИИ мгновенно проверяет её по надёжным официальным источникам.",
+        placeholder: "Вставьте заголовок новости или фрагмент статьи сюда...",
+        analyzeBtn: "Анализировать",
+        loaderText: "ИИ анализирует...",
+        step1: "Поиск в интернете...",
+        step2: "Глубокий анализ...",
+        step3: "Проверка базы фактов...",
+        rtBadge: "Анализируется",
+        lblAnalysis: "Анализ",
+        lblSignals: "Обнаруженные сигналы",
+        lblSources: "Источники",
+        lblFactCheck: "Результаты проверки",
+        lblShare: "Поделиться",
+        copyBtn: "Копировать",
+        copiedBtn: "Скопировано!",
+        shareBtn: "Поделиться",
+        verdictFake: "ВЕРОЯТНО ФЕЙК",
+        verdictSus: "ПОДОЗРИТЕЛЬНО",
+        verdictReal: "ВЕРОЯТНО ПРАВДА",
+        confidence: "% уверенность",
+        noSources: "Источники не найдены",
+        errorEmpty: "Пожалуйста, введите текст для анализа.",
+        errorGeneral: "Что-то пошло не так.",
+        sbMenuLabel: "Меню",
+        sbSecUser: "Пользователь",
+        sbLoggedIn: "Вошёл в систему",
+        sbLogout: "Выйти",
+        sbLogoutSub: "Выйти из системы",
+        sbSecSettings: "Настройки",
+        sbLangTitle: "Язык",
+        sbSecFeatures: "Функции",
+        sbPremium: "Премиум",
+        sbComingSoon: "Скоро...",
+        sbStats: "Статистика",
+        sbContact: "Контакт",
+        darkMode: "Тёмная тема",
+        lightMode: "Светлая тема",
+        darkModeSub: "Сейчас: Тёмная",
+        lightModeSub: "Сейчас: Светлая",
+        footer: "VerAi team — Since 2026",
+        shareClipboard: "🔍 VerAi — Fake News Detector\n\n📊 Результат: {verdict}\n💯 Уверенность: {pct}%\n\n{summary}\n\n──────────────\nverai.uz · BulderFounders",
+        srcConfirms: "✓ Подтверждает",
+        srcContradicts: "✗ Опровергает",
+        srcRelated: "~ Связано",
+      },
+      ja: {
+        mainTitle: 'フェイクニュース',
+        mainTitleAccent: '検出器',
+        mainSubtitle: "ニュースの見出しや記事を貼り付けてください。AIが信頼できる公式情報源と照合して即座に分析します。",
+        placeholder: "ニュースの見出しや記事の一部をここに貼り付けてください...",
+        analyzeBtn: "コンテンツを分析",
+        loaderText: "AIが分析中...",
+        step1: "インターネットを検索中...",
+        step2: "詳細分析中...",
+        step3: "ファクトチェックデータベースを確認中...",
+        rtBadge: "分析中",
+        lblAnalysis: "分析",
+        lblSignals: "検出されたシグナル",
+        lblSources: "インターネットソース",
+        lblFactCheck: "ファクトチェック結果",
+        lblShare: "共有",
+        copyBtn: "コピー",
+        copiedBtn: "コピーしました！",
+        shareBtn: "共有",
+        verdictFake: "フェイクの可能性が高い",
+        verdictSus: "疑わしい",
+        verdictReal: "本物の可能性が高い",
+        confidence: "% 信頼度",
+        noSources: "インターネットソースが見つかりません",
+        errorEmpty: "分析するテキストを入力してください。",
+        errorGeneral: "エラーが発生しました。",
+        sbMenuLabel: "メニュー",
+        sbSecUser: "ユーザー",
+        sbLoggedIn: "ログイン済み",
+        sbLogout: "ログアウト",
+        sbLogoutSub: "システムからログアウト",
+        sbSecSettings: "設定",
+        sbLangTitle: "言語",
+        sbSecFeatures: "機能",
+        sbPremium: "プレミアム",
+        sbComingSoon: "近日公開...",
+        sbStats: "統計",
+        sbContact: "お問い合わせ",
+        darkMode: "ダークモード",
+        lightMode: "ライトモード",
+        darkModeSub: "現在: ダークモード",
+        lightModeSub: "現在: ライトモード",
+        footer: "VerAi team — Since 2026",
+        shareClipboard: "🔍 VerAi — フェイクニュース検出器\n\n📊 結果: {verdict}\n💯 信頼度: {pct}%\n\n{summary}\n\n──────────────\nverai.uz · BulderFounders",
+        srcConfirms: "✓ 確認",
+        srcContradicts: "✗ 否定",
+        srcRelated: "~ 関連",
+      },
+      zh: {
+        mainTitle: '虚假新闻',
+        mainTitleAccent: '检测器',
+        mainSubtitle: "粘贴新闻标题或文章。AI立即与可信官方来源进行分析比对。",
+        placeholder: "将新闻标题或文章片段粘贴到此处...",
+        analyzeBtn: "分析内容",
+        loaderText: "AI正在分析...",
+        step1: "正在搜索互联网...",
+        step2: "深度分析中...",
+        step3: "正在检查事实核查数据库...",
+        rtBadge: "分析中",
+        lblAnalysis: "分析",
+        lblSignals: "检测到的信号",
+        lblSources: "互联网来源",
+        lblFactCheck: "事实核查结果",
+        lblShare: "分享",
+        copyBtn: "复制",
+        copiedBtn: "已复制！",
+        shareBtn: "分享",
+        verdictFake: "可能是假新闻",
+        verdictSus: "可疑",
+        verdictReal: "可能是真实新闻",
+        confidence: "% 置信度",
+        noSources: "未找到互联网来源",
+        errorEmpty: "请输入要分析的文本。",
+        errorGeneral: "出现了问题。",
+        sbMenuLabel: "菜单",
+        sbSecUser: "用户",
+        sbLoggedIn: "已登录",
+        sbLogout: "退出",
+        sbLogoutSub: "从系统退出",
+        sbSecSettings: "设置",
+        sbLangTitle: "语言",
+        sbSecFeatures: "功能",
+        sbPremium: "高级版",
+        sbComingSoon: "即将推出...",
+        sbStats: "统计",
+        sbContact: "联系",
+        darkMode: "深色模式",
+        lightMode: "浅色模式",
+        darkModeSub: "当前: 深色模式",
+        lightModeSub: "当前: 浅色模式",
+        footer: "VerAi team — Since 2026",
+        shareClipboard: "🔍 VerAi — 虚假新闻检测器\n\n📊 结果: {verdict}\n💯 置信度: {pct}%\n\n{summary}\n\n──────────────\nverai.uz · BulderFounders",
+        srcConfirms: "✓ 确认",
+        srcContradicts: "✗ 否认",
+        srcRelated: "~ 相关",
+      }
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // STATE
+    // ══════════════════════════════════════════════════════════════
+    let currentLang = localStorage.getItem('verai_lang') || 'uz';
+    let isDark = localStorage.getItem('verai_theme') !== 'light';
+
+    function T(key) {
+      return (TRANSLATIONS[currentLang] || TRANSLATIONS['uz'])[key] || TRANSLATIONS['uz'][key] || key;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // APPLY LANGUAGE — update all UI text
+    // ══════════════════════════════════════════════════════════════
+    function applyLang() {
+      const t = TRANSLATIONS[currentLang] || TRANSLATIONS['uz'];
+      const meta = LANG_META[currentLang] || LANG_META['uz'];
+
+      // Main
+      document.getElementById('mainTitle').innerHTML = t.mainTitle + '<br><span id="mainTitleAccent">' + t.mainTitleAccent + '</span>';
+      document.querySelector('#mainTitle span').style.color = 'var(--accent)';
+      document.getElementById('mainSubtitle').textContent = t.mainSubtitle;
+      document.getElementById('newsInput').placeholder = t.placeholder;
+      document.getElementById('analyzeBtn').textContent = t.analyzeBtn;
+      document.getElementById('loaderText').textContent = t.loaderText;
+      document.getElementById('step1Text').textContent = t.step1;
+      document.getElementById('step2Text').textContent = t.step2;
+      document.getElementById('step3Text').textContent = t.step3;
+      document.getElementById('rtText').textContent = t.rtBadge;
+      document.getElementById('lblAnalysis').textContent = t.lblAnalysis;
+      document.getElementById('lblSignals').textContent = t.lblSignals;
+      document.getElementById('lblSources').textContent = t.lblSources;
+      document.getElementById('lblFactCheck').textContent = t.lblFactCheck;
+      document.getElementById('lblShare').textContent = t.lblShare;
+      document.getElementById('copyBtnText').textContent = t.copyBtn;
+      document.getElementById('shareBtnText').textContent = t.shareBtn;
+      document.getElementById('mainFooter').innerHTML = t.footer;
+
+      // Sidebar
+      document.getElementById('sbMenuLabel').textContent = t.sbMenuLabel;
+      document.getElementById('sbSecUser').textContent = t.sbSecUser;
+      document.getElementById('sbLoggedIn').textContent = t.sbLoggedIn;
+      document.getElementById('sbLogout').textContent = t.sbLogout;
+      document.getElementById('sbLogoutSub').textContent = t.sbLogoutSub;
+      document.getElementById('sbSecSettings').textContent = t.sbSecSettings;
+      document.getElementById('sbLangTitle').textContent = t.sbLangTitle;
+      document.getElementById('sbLangSub').textContent = meta.name;
+      document.getElementById('langFlagIcon').textContent = meta.flag;
+      document.getElementById('sbSecFeatures').textContent = t.sbSecFeatures;
+      document.getElementById('sbPremium').textContent = t.sbPremium;
+      document.getElementById('sbComingSoon1').textContent = t.sbComingSoon;
+      document.getElementById('sbComingSoon2').textContent = t.sbComingSoon;
+      document.getElementById('sbStats').textContent = t.sbStats;
+      document.getElementById('sbContact').textContent = t.sbContact;
+
+      // Theme labels (keep in sync with current theme state)
+      updateThemeLabels();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SIDEBAR
+    // ══════════════════════════════════════════════════════════════
     const menuBtn = document.getElementById('menuBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
+
     function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); menuBtn.classList.add('hidden'); document.body.style.overflow = 'hidden'; }
     function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); menuBtn.classList.remove('hidden'); document.body.style.overflow = ''; }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
 
-    let isDark = true;
+    // ══════════════════════════════════════════════════════════════
+    // THEME
+    // ══════════════════════════════════════════════════════════════
     const moonSVG = `<svg viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="16" height="16"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
     const sunSVG = `<svg viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
-    function toggleTheme() {
-      isDark = !isDark;
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+    function updateThemeLabels() {
       document.getElementById('toggleTrack').classList.toggle('on', isDark);
       document.getElementById('toggleThumb').classList.toggle('on', isDark);
       document.getElementById('themeIcon').innerHTML = isDark ? moonSVG : sunSVG;
-      document.getElementById('themeTitle').textContent = isDark ? 'Dark Mode' : 'Light Mode';
-      document.getElementById('themeSub').textContent = isDark ? "Hozir: Qorong'i rejim" : "Hozir: Yorug' rejim";
+      document.getElementById('themeTitle').textContent = isDark ? T('darkMode') : T('lightMode');
+      document.getElementById('themeSub').textContent = isDark ? T('darkModeSub') : T('lightModeSub');
     }
 
-    const stats = { total: 0, fake: 0, sus: 0, real: 0 };
-    function updateStats(verdict) {
-      stats.total++;
-      if (verdict === 'LIKELY FAKE') stats.fake++;
-      else if (verdict === 'SUSPICIOUS') stats.sus++;
-      else stats.real++;
-      animCount('statTotal', stats.total); animCount('statFake', stats.fake);
-      animCount('statSus', stats.sus); animCount('statReal', stats.real);
-    }
-    function animCount(id, target) {
-      const el = document.getElementById(id);
-      const from = parseInt(el.textContent) || 0;
-      const dur = 480; const t0 = performance.now();
-      const tick = now => {
-        const p = Math.min((now - t0) / dur, 1);
-        el.textContent = Math.round(from + (target - from) * (p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p));
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+    function toggleTheme() {
+      isDark = !isDark;
+      localStorage.setItem('verai_theme', isDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      updateThemeLabels();
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // REALTIME TYPING
+    // ══════════════════════════════════════════════════════════════
     let rtTimer = null;
     document.getElementById('newsInput').addEventListener('input', () => {
       const val = document.getElementById('newsInput').value.trim();
@@ -1446,11 +1705,12 @@
       clearTimeout(rtTimer);
       if (!val) { badge.classList.remove('visible'); return; }
       badge.classList.add('visible');
-      rtTimer = setTimeout(() => {
-        badge.classList.remove('visible');
-      }, 850);
+      rtTimer = setTimeout(() => { badge.classList.remove('visible'); }, 850);
     });
 
+    // ══════════════════════════════════════════════════════════════
+    // ARC METER
+    // ══════════════════════════════════════════════════════════════
     const ARC_TOTAL = 103.67;
     function setArc(pct, color) {
       const fill = document.getElementById('arcFill');
@@ -1461,73 +1721,83 @@
       txt.setAttribute('fill', color);
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // SOURCES
+    // ══════════════════════════════════════════════════════════════
     function renderSources(sources) {
       const row = document.getElementById('sourcesRow');
       if (!sources || sources.length === 0) {
-        row.innerHTML = '<span class="no-sources">Internet manbalar topilmadi</span>';
+        row.innerHTML = `<span class="no-sources">${T('noSources')}</span>`;
         return;
       }
-      const statusConfig = {
-        'confirms': { dot: 'var(--real)', label: '✓ Tasdiqlaydi', color: 'var(--real)' },
-        'contradicts': { dot: 'var(--fake)', label: '✗ Rad etadi', color: 'var(--fake)' },
-        'related': { dot: 'var(--suspicious)', label: '~ Tegishli', color: 'var(--suspicious)' }
+      const statusCfg = {
+        confirms: { dot: 'var(--real)', label: T('srcConfirms') },
+        contradicts: { dot: 'var(--fake)', label: T('srcContradicts') },
+        related: { dot: 'var(--suspicious)', label: T('srcRelated)') },
       };
       row.innerHTML = sources.map(s => {
-        const cfg = statusConfig[s.status] || statusConfig['related'];
+        const cfg = statusCfg[s.status] || statusCfg['related'];
         const title = s.title ? `<span class="source-title" title="${s.title}">${s.title}</span>` : '';
         return `<a class="source-card" href="${s.url}" target="_blank" rel="noopener">
-        <span class="source-dot" style="background:${cfg.dot}"></span>
-        <div><span class="source-name">${s.name}</span>${title}
-        <span class="source-status" style="color:${cfg.color}">${cfg.label}</span></div></a>`;
+      <span class="source-dot" style="background:${cfg.dot}"></span>
+      <div><span class="source-name">${s.name}</span>${title}
+      <span class="source-status" style="color:${cfg.dot}">${cfg.label}</span></div></a>`;
       }).join('');
     }
 
     function renderFactChecks(checks) {
       const section = document.getElementById('factcheckSection');
       const row = document.getElementById('factcheckRow');
-      if (!checks || checks.length === 0) {
-        section.style.display = 'none';
-        return;
-      }
+      if (!checks || checks.length === 0) { section.style.display = 'none'; return; }
       section.style.display = 'block';
       row.innerHTML = checks.map(fc => {
-        const rating = (fc.rating || '').toLowerCase();
-        let iconClass = 'mixed';
-        let icon = '⚠️';
-        if (rating.includes('false') || rating.includes('fake') || rating.includes('pants')) { iconClass = 'false'; icon = '✗'; }
-        else if (rating.includes('true') || rating.includes('correct')) { iconClass = 'true'; icon = '✓'; }
+        const r = (fc.rating || '').toLowerCase();
+        let iconClass = 'mixed', icon = '⚠️';
+        if (r.includes('false') || r.includes('fake') || r.includes('pants')) { iconClass = 'false'; icon = '✗'; }
+        else if (r.includes('true') || r.includes('correct')) { iconClass = 'true'; icon = '✓'; }
+        const ratingColor = iconClass === 'false' ? 'var(--fake)' : iconClass === 'true' ? 'var(--real)' : 'var(--suspicious)';
         return `<a class="factcheck-card" href="${fc.url}" target="_blank" rel="noopener">
-        <div class="fc-icon ${iconClass}">${icon}</div>
-        <div class="fc-info">
-          <div><span class="fc-publisher">${fc.publisher}</span><span class="fc-rating" style="color:var(--${iconClass === 'false' ? 'fake' : iconClass === 'true' ? 'real' : 'suspicious'})">${fc.rating}</span></div>
-          <div class="fc-claim" title="${fc.claim}">${fc.claim}</div>
-        </div></a>`;
+      <div class="fc-icon ${iconClass}">${icon}</div>
+      <div class="fc-info">
+        <div><span class="fc-publisher">${fc.publisher}</span><span class="fc-rating" style="color:${ratingColor}">${fc.rating}</span></div>
+        <div class="fc-claim" title="${fc.claim}">${fc.claim}</div>
+      </div></a>`;
       }).join('');
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // SHARE
+    // ══════════════════════════════════════════════════════════════
     let lastResult = null;
-    const VERDICT_LABELS = { 'LIKELY FAKE': 'SOXTA EHTIMOLI YUQORI', 'SUSPICIOUS': 'SHUBHALI', 'LIKELY REAL': 'HAQIQIY EHTIMOLI YUQORI' };
 
     function copyResult() {
       if (!lastResult) return;
-      const text = `🔍 VerAi — Fake News Detector\n\n📊 Natija: ${VERDICT_LABELS[lastResult.verdict] || lastResult.verdict}\n💯 Ishonch: ${lastResult.confidence}%\n\n${lastResult.summary}\n\n──────────────\nverai.uz · BulderFounders · AI Hackathon 2025`;
+      const tpl = T('shareClipboard');
+      const text = tpl
+        .replace('{verdict}', T('verdict' + (lastResult.verdict === 'LIKELY FAKE' ? 'Fake' : lastResult.verdict === 'SUSPICIOUS' ? 'Sus' : 'Real')))
+        .replace('{pct}', lastResult.confidence)
+        .replace('{summary}', lastResult.summary);
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.getElementById('copyBtn');
         btn.classList.add('copied');
-        btn.innerHTML = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg> Nusxalandi!`;
+        document.getElementById('copyBtnText').textContent = T('copiedBtn');
         setTimeout(() => {
           btn.classList.remove('copied');
-          btn.innerHTML = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Nusxalash`;
+          document.getElementById('copyBtnText').textContent = T('copyBtn');
         }, 2500);
       }).catch(() => { });
     }
     function shareResult() {
       if (!lastResult) return;
-      const txt = `VerAi: ${VERDICT_LABELS[lastResult.verdict]} — ${lastResult.confidence}% ishonch\n${lastResult.summary}\nverai.uz`;
-      if (navigator.share) navigator.share({ title: 'VerAi natijasi', text: txt }).catch(() => { });
+      const verdict = T('verdict' + (lastResult.verdict === 'LIKELY FAKE' ? 'Fake' : lastResult.verdict === 'SUSPICIOUS' ? 'Sus' : 'Real'));
+      const txt = `VerAi: ${verdict} — ${lastResult.confidence}${T('confidence')}\n${lastResult.summary}\nverai.uz`;
+      if (navigator.share) navigator.share({ title: 'VerAi', text: txt }).catch(() => { });
       else copyResult();
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // LOADER STEPS
+    // ══════════════════════════════════════════════════════════════
     let stepInterval = null;
     function animateSteps() {
       const steps = ['step1', 'step2', 'step3'];
@@ -1543,31 +1813,39 @@
     }
     function stopSteps() {
       if (stepInterval) clearInterval(stepInterval);
-      ['step1', 'step2', 'step3'].forEach(s => {
-        document.getElementById(s).className = 'loader-step done';
-      });
+      ['step1', 'step2', 'step3'].forEach(s => { document.getElementById(s).className = 'loader-step done'; });
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // ANALYZE
+    // ══════════════════════════════════════════════════════════════
     async function analyze(silent = false) {
       const text = document.getElementById('newsInput').value.trim();
       const btn = document.getElementById('analyzeBtn');
       const loader = document.getElementById('loader');
       const result = document.getElementById('result');
       const errorMsg = document.getElementById('errorMsg');
+
       errorMsg.style.display = 'none';
       if (!silent) result.style.display = 'none';
       if (!text) {
-        if (!silent) { errorMsg.textContent = 'Iltimos, tahlil qilish uchun matn kiriting.'; errorMsg.style.display = 'block'; }
+        if (!silent) { errorMsg.textContent = T('errorEmpty'); errorMsg.style.display = 'block'; }
         return;
       }
       if (!silent) { btn.disabled = true; loader.style.display = 'flex'; animateSteps(); }
+
       try {
-        const res = await fetch('/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-        if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Server xatosi'); }
+        const res = await fetch('/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang: currentLang })   // ← language sent to backend
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.error || T('errorGeneral')); }
         const d = await res.json();
-        lastResult = d; render(d); updateStats(d.verdict);
+        lastResult = d;
+        render(d);
       } catch (e) {
-        if (!silent) { errorMsg.textContent = "Xato: " + (e.message || "Nimadir noto'g'ri ketdi."); errorMsg.style.display = 'block'; }
+        if (!silent) { errorMsg.textContent = "Xato: " + (e.message || T('errorGeneral')); errorMsg.style.display = 'block'; }
       } finally {
         if (!silent) { stopSteps(); btn.disabled = false; loader.style.display = 'none'; }
       }
@@ -1577,24 +1855,32 @@
       const cfg = {
         'LIKELY FAKE': { bg: 'var(--v-fake-bg)', b: 'var(--v-fake-b)', t: 'var(--v-fake-t)', p: 'var(--v-fake-p)', arc: '#ff5c5c' },
         'SUSPICIOUS': { bg: 'var(--v-sus-bg)', b: 'var(--v-sus-b)', t: 'var(--v-sus-t)', p: 'var(--v-sus-p)', arc: '#ffb347' },
-        'LIKELY REAL': { bg: 'var(--v-real-bg)', b: 'var(--v-real-b)', t: 'var(--v-real-t)', p: 'var(--v-real-p)', arc: '#5cffa0' }
+        'LIKELY REAL': { bg: 'var(--v-real-bg)', b: 'var(--v-real-b)', t: 'var(--v-real-t)', p: 'var(--v-real-p)', arc: '#5cffa0' },
       };
       const c = cfg[d.verdict] || cfg['SUSPICIOUS'];
+      const verdictKey = d.verdict === 'LIKELY FAKE' ? 'verdictFake' : d.verdict === 'SUSPICIOUS' ? 'verdictSus' : 'verdictReal';
+
       const header = document.getElementById('verdictHeader');
       header.style.background = c.bg;
       header.style.borderBottom = '1px solid ' + c.b;
+
       setArc(d.confidence, c.arc);
+
       const vt = document.getElementById('verdictText');
-      vt.textContent = VERDICT_LABELS[d.verdict] || d.verdict;
+      vt.textContent = T(verdictKey);
       vt.style.color = c.t;
+
       const badge = document.getElementById('confidenceBadge');
-      badge.textContent = d.confidence + '% ishonch';
+      badge.textContent = d.confidence + T('confidence');
       badge.style.background = c.p;
       badge.style.color = c.t;
+
       document.getElementById('summaryText').textContent = d.summary;
       document.getElementById('chipsContainer').innerHTML = (d.signals || []).map(s => `<span class="chip">${s}</span>`).join('');
+
       renderSources(d.sources || []);
       renderFactChecks(d.fact_checks || []);
+
       const resultEl = document.getElementById('result');
       resultEl.style.borderColor = c.b;
       resultEl.style.display = 'block';
@@ -1603,6 +1889,145 @@
     document.getElementById('newsInput').addEventListener('keydown', e => {
       if (e.ctrlKey && e.key === 'Enter') analyze();
     });
+
+    async function handleLogout() {
+      try { await fetch('/api/logout', { method: 'POST' }); } catch (_) { }
+      window.location.href = '/auth';
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════════════════════
+    (function init() {
+      // Apply saved theme
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      // Apply saved language
+      applyLang();
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // SOURCES
+    // ══════════════════════════════════════════════════════════════
+    function renderSources(sources) {
+      const row = document.getElementById('sourcesRow');
+      if (!sources || sources.length === 0) {
+        row.innerHTML = `<span class="no-sources">${T('noSources')}</span>`;
+        return;
+      }
+      const statusCfg = {
+        confirms: { dot: 'var(--real)', label: T('srcConfirms') },
+        contradicts: { dot: 'var(--fake)', label: T('srcContradicts') },
+        related: { dot: 'var(--suspicious)', label: T('srcRelated)') },
+      };
+      row.innerHTML = sources.map(s => {
+        const cfg = statusCfg[s.status] || statusCfg['related'];
+        const title = s.title ? `<span class="source-title" title="${s.title}">${s.title}</span>` : '';
+        return `<a class="source-card" href="${s.url}" target="_blank" rel="noopener">
+        <span class="source-dot" style="background:${cfg.dot}"></span>
+        <div><span class="source-name">${s.name}</span>${title}
+        <span class="source-status" style="color:${cfg.dot}">${cfg.label}</span></div></a>`;
+      }).join('');
+    }
+
+    function renderFactChecks(checks) {
+      const section = document.getElementById('factcheckSection');
+      const row = document.getElementById('factcheckRow');
+      if (!checks || checks.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+      row.innerHTML = checks.map(fc => {
+        const r = (fc.rating || '').toLowerCase();
+        let iconClass = 'mixed', icon = '⚠️';
+        if (r.includes('false') || r.includes('fake') || r.includes('pants')) { iconClass = 'false'; icon = '✗'; }
+        else if (r.includes('true') || r.includes('correct')) { iconClass = 'true'; icon = '✓'; }
+        const ratingColor = iconClass === 'false' ? 'var(--fake)' : iconClass === 'true' ? 'var(--real)' : 'var(--suspicious)';
+        return `<a class="factcheck-card" href="${fc.url}" target="_blank" rel="noopener">
+        <div class="fc-icon ${iconClass}">${icon}</div>
+        <div class="fc-info">
+          <div><span class="fc-publisher">${fc.publisher}</span><span class="fc-rating" style="color:${ratingColor}">${fc.rating}</span></div>
+          <div class="fc-claim" title="${fc.claim}">${fc.claim}</div>
+        </div></a>`;
+      }).join('');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ANALYZE
+    // ══════════════════════════════════════════════════════════════
+    async function analyze(silent = false) {
+      const text = document.getElementById('newsInput').value.trim();
+      const btn = document.getElementById('analyzeBtn');
+      const loader = document.getElementById('loader');
+      const result = document.getElementById('result');
+      const errorMsg = document.getElementById('errorMsg');
+
+      errorMsg.style.display = 'none';
+      if (!silent) result.style.display = 'none';
+      if (!text) {
+        if (!silent) { errorMsg.textContent = T('errorEmpty'); errorMsg.style.display = 'block'; }
+        return;
+      }
+      if (!silent) { btn.disabled = true; loader.style.display = 'flex'; animateSteps(); }
+
+      try {
+        const res = await fetch('/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang: currentLang })   // ← language sent to backend
+        });
+        if (!res.ok) { const e = await res.json(); throw new Error(e.error || T('errorGeneral')); }
+        const d = await res.json();
+        lastResult = d;
+        render(d);
+      } catch (e) {
+        if (!silent) { errorMsg.textContent = "Xato: " + (e.message || T('errorGeneral')); errorMsg.style.display = 'block'; }
+      } finally {
+        if (!silent) { stopSteps(); btn.disabled = false; loader.style.display = 'none'; }
+      }
+    }
+
+    function render(d) {
+      const cfg = {
+        'LIKELY FAKE': { bg: 'var(--v-fake-bg)', b: 'var(--v-fake-b)', t: 'var(--v-fake-t)', p: 'var(--v-fake-p)', arc: '#ff5c5c' },
+        'SUSPICIOUS': { bg: 'var(--v-sus-bg)', b: 'var(--v-sus-b)', t: 'var(--v-sus-t)', p: 'var(--v-sus-p)', arc: '#ffb347' },
+        'LIKELY REAL': { bg: 'var(--v-real-bg)', b: 'var(--v-real-b)', t: 'var(--v-real-t)', p: 'var(--v-real-p)', arc: '#5cffa0' },
+      };
+      const c = cfg[d.verdict] || cfg['SUSPICIOUS'];
+      const verdictKey = d.verdict === 'LIKELY FAKE' ? 'verdictFake' : d.verdict === 'SUSPICIOUS' ? 'verdictSus' : 'verdictReal';
+
+      const header = document.getElementById('verdictHeader');
+      header.style.background = c.bg;
+      header.style.borderBottom = '1px solid ' + c.b;
+
+      setArc(d.confidence, c.arc);
+
+      const vt = document.getElementById('verdictText');
+      vt.textContent = T(verdictKey);
+      vt.style.color = c.t;
+
+      const badge = document.getElementById('confidenceBadge');
+      badge.textContent = d.confidence + T('confidence');
+      badge.style.background = c.p;
+      badge.style.color = c.t;
+
+      document.getElementById('summaryText').textContent = d.summary;
+      document.getElementById('chipsContainer').innerHTML = (d.signals || []).map(s => `<span class="chip">${s}</span>`).join('');
+
+      renderSources(d.sources || []);
+      renderFactChecks(d.fact_checks || []);
+
+      const resultEl = document.getElementById('result');
+      resultEl.style.borderColor = c.b;
+      resultEl.style.display = 'block';
+    }
+
+    document.getElementById('newsInput').addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'Enter') analyze();
+    });
+
+    async function handleLogout() {
+      try { await fetch('/api/logout', { method: 'POST' }); } catch (_) { }
+      window.location.href = '/auth';
+    }
+
 
     // ── Auth check ──────────────────────────────
     async function checkAuth() {
@@ -1626,6 +2051,16 @@
       } catch (_) { }
       window.location.href = '/auth';
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════════════════════
+    (function init() {
+      // Apply saved theme
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      // Apply saved language
+      applyLang();
+    })();
   </script>
 </body>
 
