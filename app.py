@@ -47,6 +47,11 @@ def auth_page():
     return send_from_directory('public', 'auth.html')
 
 
+@app.route('/languages')
+def languages_page():
+    return send_from_directory('public', 'languages.html')
+
+
 # ── Auth API ────────────────────────────────────────────────────
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -195,7 +200,7 @@ def search_web_for_claim(text):
         return None
 
 
-def analyze_with_evidence(text, search_results):
+def analyze_with_evidence(text, search_results, lang='uz'):
     """
     Step 2: Use Llama 3.3 70B to deeply analyze the news
     with the web search evidence from Step 1.
@@ -203,16 +208,33 @@ def analyze_with_evidence(text, search_results):
     if not GROQ_API_KEY:
         return None
 
+    # Language-specific labels for internal context
+    labels = {
+        'uz': {'confirms': 'TASDIQLAYDI', 'contradicts': 'RAD ETADI', 'related': 'TEGISHLI', 'unknown': 'NOMA\'LUM', 'none': 'Internet qidiruvida natija topilmadi.'},
+        'en': {'confirms': 'CONFIRMS', 'contradicts': 'CONTRADICTS', 'related': 'RELATED', 'unknown': 'UNKNOWN', 'none': 'No results found in web search.'},
+        'ru': {'confirms': 'ПОДТВЕРЖДАЕТ', 'contradicts': 'ОПРОВЕРГАЕТ', 'related': 'СВЯЗАНО', 'unknown': 'НЕИЗВЕСТНО', 'none': 'Результатов поиска в интернете не найдено.'},
+        'ja': {'confirms': '確認済み', 'contradicts': '否定された', 'related': '関連', 'unknown': '不明', 'none': 'ウェブ検索の結果が見つかりませんでした。'},
+        'zh': {'confirms': '核实', 'contradicts': '否认', 'related': '相关', 'unknown': '未知', 'none': '未在网页搜索中找到结果。'}
+    }
+    
+    # Language names for the prompt
+    lang_names = {
+        'uz': "o'zbek tilida",
+        'en': "in English",
+        'ru': "на русском языке",
+        'ja': "日本語で",
+        'zh': "用中文"
+    }
+
+    l = labels.get(lang, labels['en'])
+    ln = lang_names.get(lang, "in English")
+
     # Build context from search results
     evidence_context = ''
     if search_results and search_results.get('sources'):
         evidence_lines = []
         for src in search_results['sources']:
-            status_label = {
-                'confirms': 'TASDIQLAYDI',
-                'contradicts': 'RAD ETADI',
-                'related': 'TEGISHLI'
-            }.get(src.get('status', ''), 'NOMA\'LUM')
+            status_label = l.get(src.get('status', ''), l['unknown'])
             evidence_lines.append(
                 f"- [{status_label}] {src.get('title', 'N/A')} ({src.get('url', '')})\n"
                 f"  {src.get('snippet', '')}"
@@ -220,7 +242,7 @@ def analyze_with_evidence(text, search_results):
         evidence_context = '\n'.join(evidence_lines)
         web_consensus = search_results.get('web_consensus', 'unverified')
     else:
-        evidence_context = 'Internet qidiruvida natija topilmadi.'
+        evidence_context = l['none']
         web_consensus = 'unverified'
 
     system_prompt = f"""You are a fake news detection expert. You have been given a news text AND real web search results about this claim.
@@ -231,12 +253,14 @@ WEB SEARCH RESULTS:
 WEB CONSENSUS: {web_consensus}
 
 Based on BOTH the news text analysis AND the web search evidence, return ONLY a valid JSON object.
-No preamble, no markdown, no backticks. Write summary and signals in Uzbek language.
+No preamble, no markdown, no backticks. Write summary and signals {ln}.
 Use exactly these fields:
-{{"verdict": "LIKELY FAKE" or "SUSPICIOUS" or "LIKELY REAL",
-"confidence": integer 0-100,
-"summary": "2-5 jumladan iborat tushuntirish o'zbek tilida, internet qidiruv natijalariga asoslangan",
-"signals": ["3 dan 5 tagacha qisqa signal o'zbek tilida"]}}
+{{
+  "verdict": "LIKELY FAKE" or "SUSPICIOUS" or "LIKELY REAL",
+  "confidence": integer 0-100,
+  "summary": "2-5 sentences explanation {ln}, based on web search results",
+  "signals": ["3 to 5 short signals {ln}"]
+}}
 
 IMPORTANT: Base your verdict on the WEB EVIDENCE, not just your general knowledge.
 If web sources contradict the claim, it's likely fake.
@@ -347,6 +371,7 @@ def check_factcheck_db(text):
 def analyze():
     data = request.get_json()
     text = data.get('text', '').strip()
+    lang = data.get('lang', 'uz')
 
     if not text:
         return jsonify({'error': 'No text provided'}), 400
@@ -362,7 +387,7 @@ def analyze():
             search_results = search_web_for_claim(text)
 
             # Step 2: Deep analysis with web evidence
-            analysis = analyze_with_evidence(text, search_results)
+            analysis = analyze_with_evidence(text, search_results, lang)
 
             # Collect fact check results
             try:
