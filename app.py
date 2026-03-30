@@ -11,7 +11,7 @@ from groq import Groq
 load_dotenv()
 
 app = Flask(__name__, static_folder='public')
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
+app.secret_key = os.environ.get('SECRET_KEY')
 
 # ── Supabase setup ──────────────────────────────────────────────
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
@@ -48,6 +48,7 @@ def auth_page():
 
 
 @app.route('/languages')
+@app.route('/languages.html')
 def languages_page():
     return send_from_directory('public', 'languages.html')
 
@@ -441,5 +442,4 @@ def extract_domain(url):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 3000)))
