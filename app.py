@@ -316,7 +316,7 @@ def check_factcheck_db(text):
             params={
                 'query': query,
                 'key': GOOGLE_FACTCHECK_API_KEY,
-                'languageCode': 'uz'  # Try Uzbek first
+                'languageCode': 'en'  # Try Uzbek first
             },
             timeout=8
         )
@@ -372,7 +372,7 @@ def check_factcheck_db(text):
 def analyze():
     data = request.get_json()
     text = data.get('text', '').strip()
-    lang = data.get('lang', 'uz')
+    lang = data.get('lang', 'en')
 
     if not text:
         return jsonify({'error': 'No text provided'}), 400
