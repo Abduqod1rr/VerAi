@@ -43,6 +43,7 @@ def index():
 
 
 @app.route('/auth')
+@app.route('/auth.html')
 def auth_page():
     return send_from_directory('public', 'auth.html')
 
@@ -51,6 +52,12 @@ def auth_page():
 @app.route('/languages.html')
 def languages_page():
     return send_from_directory('public', 'languages.html')
+
+
+@app.route('/feed')
+@app.route('/feed.html')
+def feed_page():
+    return send_from_directory('public', 'feed.html')
 
 
 # ── Auth API ────────────────────────────────────────────────────
